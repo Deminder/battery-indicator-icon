@@ -153,9 +153,13 @@ var BatteryDrawIcon = GObject.registerClass(
         layout.set_alignment(1);
         PangoCairo.update_layout(cr, layout);
 
-        const [rw, rh] = layout.get_pixel_size();
+        const [ir, lr] = layout.get_pixel_extents();
+        const ascend = ir.y + ir.height - (lr.y + lr.height);
         // Move line y down
-        cr.translate((w - rw) / 2.0, (h - rh + 2.5 * one) / 2.0);
+        cr.translate(
+          -lr.x + (w - lr.width) / 2.0,
+          -lr.y + (h - lr.height - ascend) / 2.0
+        );
 
         PangoCairo.show_layout(cr, layout);
       }

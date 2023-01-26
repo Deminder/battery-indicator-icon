@@ -80,7 +80,7 @@ function fillPreferencesWindow(window) {
     textRow.sensitive = settings.get_string('status-style') !== 'hidden';
     dsettings.set_boolean(
       'show-battery-percentage',
-      textRow.selectedItem.value === 'nextTo'
+      textRow.selected === 2 // Selected `text`
     );
   };
   settings.connect('changed::status-style', update);
