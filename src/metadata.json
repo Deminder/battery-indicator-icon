@@ -1,0 +1,11 @@
+{
+  "shell-version": ["43"],
+  "uuid": "battery-indicator-icon@Deminder",
+  "gettext-domain": "battery-indicator-icon",
+  "settings-schema": "org.gnome.shell.extensions.battery-indicator-icon",
+  "description": "Replace the battery indicator icon with a circle or portrait.",
+  "name": "Battery Indicator Icon",
+  "url": "https://github.com/Deminder/battery-indicator-icon",
+  "session-modes": ["unlock-dialog", "user"],
+  "version": 1
+}

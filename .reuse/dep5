@@ -1,0 +1,10 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: battery-indicator-icon
+Upstream-Contact: Deminder <tremminder@gmail.com>
+Source: https://github.com/Deminder/battery-indicator-icon
+
+# Sample paragraph, commented out:
+#
+# Files: src/*
+# Copyright: $YEAR $NAME <$CONTACT>
+# License: ...
