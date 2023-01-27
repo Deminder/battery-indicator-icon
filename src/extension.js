@@ -36,6 +36,8 @@ class Extension {
         let statusStyle =
           statusStyleStr === 'portrait'
             ? BStatusStyle.PORTRAIT
+            : statusStyleStr === 'plainportrait'
+            ? BStatusStyle.PLAINPORTRAIT
             : BStatusStyle.CIRCLE;
         if (debugMode) {
           charging = this._debugCounter % 7 === 0;

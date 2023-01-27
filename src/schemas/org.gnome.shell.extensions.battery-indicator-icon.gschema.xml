@@ -11,7 +11,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
     <key type="s" name="status-style">
       <default>"portrait"</default>
-      <summary>Battery status icon style (portrait, circle, hidden)</summary>
+      <summary>Battery status icon style (portrait, plainportrait, circle, hidden)</summary>
     </key>
 
     <key type="b" name="show-icon-text">

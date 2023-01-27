@@ -38,7 +38,7 @@ function fillPreferencesWindow(window) {
   const group = new Adw.PreferencesGroup();
   page.add(group);
   const textRow = createComboRow(
-    _('Show battery percentage text in icon'),
+    _('Battery percentage text'),
     {
       hidden: _('Hidden'),
       inside: _('Inside the icon'),
@@ -61,13 +61,14 @@ function fillPreferencesWindow(window) {
     _('Battery status icon style'),
     {
       portrait: _('Icon portrait'),
+      plainportrait: _('Plain icon portrait'),
       circle: _('Circle'),
       text: _('Text'),
     },
-    ['portrait', 'circle'].includes(s) ? s : 'text',
+    s !== 'hidden' ? s : 'text',
     opt => {
       log('style', opt);
-      if (['portrait', 'circle'].includes(opt)) {
+      if (opt !== 'text') {
         settings.set_string('status-style', opt);
       } else {
         // only show text
@@ -80,7 +81,7 @@ function fillPreferencesWindow(window) {
     textRow.sensitive = settings.get_string('status-style') !== 'hidden';
     dsettings.set_boolean(
       'show-battery-percentage',
-      textRow.selected === 2 // Selected `text`
+      textRow.selected === 3 // Selected `text`
     );
   };
   settings.connect('changed::status-style', update);

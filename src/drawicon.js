@@ -14,8 +14,9 @@ var BInner = {
 
 var BStatusStyle = {
   PORTRAIT: 0,
-  CIRCLE: 1,
-  HIDE: 2,
+  PLAINPORTRAIT: 2,
+  CIRCLE: 3,
+  HIDE: 4,
 };
 
 var BatteryDrawIcon = GObject.registerClass(
@@ -84,16 +85,19 @@ var BatteryDrawIcon = GObject.registerClass(
       let bgSource = null;
       // Use background color
       Clutter.cairo_set_source_color(cr, fColor.darken().darken());
-      if (this.statusStyle === BStatusStyle.PORTRAIT) {
+      if (
+        this.statusStyle === BStatusStyle.PORTRAIT ||
+        this.statusStyle === BStatusStyle.PLAINPORTRAIT
+      ) {
         const bw = w * 0.58;
         // Battery button: rectangle
-        const [bWidth, bHeight] = [bw * 0.44, h * 0.12];
+        const [bWidth, bHeight] = [bw * 0.44, h * 0.1];
         const bh = h - bHeight;
         cr.pushGroup();
-        cr.rectangle((w - bWidth) / 2, 0, bWidth, bHeight + one);
+        cr.rectangle((w - bWidth) / 2, 0, bWidth, bHeight);
 
         // Battery body: rounded rectangle (x,y,bw,bh)
-        const r = h / 16;
+        const r = 1.5 * one;
         const cAngle = 0.5 * Math.PI;
         const [x, y] = [(w - bw) / 2, bHeight];
         cr.newSubPath();
@@ -104,12 +108,37 @@ var BatteryDrawIcon = GObject.registerClass(
         cr.closePath();
         cr.fillPreserve();
         bgSource = cr.popGroup();
-        cr.clip();
 
-        // Fill battery
-        Clutter.cairo_set_source_color(cr, fillColor);
-        cr.rectangle(0, h * (1 - p), w, h * p);
-        cr.fill();
+        if (this.statusStyle === BStatusStyle.PORTRAIT) {
+          cr.clipPreserve();
+          // Outline battery
+          Clutter.cairo_set_source_color(cr, fColor);
+          cr.setLineWidth(strokeWidth);
+          cr.stroke();
+
+          // Fill battery button
+          cr.rectangle((w - bWidth) / 2, 0, bWidth, bHeight);
+          cr.fill();
+
+          // Fill inner battery
+          Clutter.cairo_set_source_color(cr, fillColor);
+          const eps = one / 4;
+          const border = strokeWidth / 2 - eps;
+          const ih = bh - border * 2;
+          cr.rectangle(
+            x + border,
+            y + border + ih * (1 - p),
+            bw - border * 2,
+            ih * p
+          );
+          cr.fill();
+        } else {
+          // Fill battery (plain portrait)
+          Clutter.cairo_set_source_color(cr, fillColor);
+          cr.clip();
+          cr.rectangle(0, h * (1 - p), w, h * p);
+          cr.fill();
+        }
       } else if (this.statusStyle === BStatusStyle.CIRCLE) {
         const radius = (circleSize - strokeWidth) / 2;
         const [cw, ch] = [w / 2, h / 2];
@@ -127,10 +156,11 @@ var BatteryDrawIcon = GObject.registerClass(
       }
       cr.restore();
 
+      cr.setOperator(Cairo.Operator.DIFFERENCE);
+      Clutter.cairo_set_source_color(cr, fColor);
+
       if (this.inner === BInner.CHARGING) {
         // Show charging bolt
-        cr.setOperator(Cairo.Operator.DIFFERENCE);
-        Clutter.cairo_set_source_color(cr, fColor);
         const boltHeight = (h - strokeWidth - one) * 0.75;
         const boltAspect = 0.7333;
         const boltWidth = boltHeight * boltAspect;
@@ -140,16 +170,21 @@ var BatteryDrawIcon = GObject.registerClass(
         cr.fill();
       } else if (this.percentage < 100 && this.inner === BInner.TEXT) {
         // Show inner percentage text
-        cr.setOperator(Cairo.Operator.OVER);
-        Clutter.cairo_set_source_color(
-          cr,
-          this.statusStyle === BStatusStyle.PORTRAIT
-            ? themeNode.get_color('-portrai-font-color')
-            : fColor
-        );
+
+        if (this.statusStyle === BStatusStyle.PLAINPORTRAIT) {
+          cr.setOperator(Cairo.Operator.OVER);
+          Clutter.cairo_set_source_color(
+            cr,
+            themeNode.get_color('-portrait-font-color')
+          );
+        }
         const layout = PangoCairo.create_layout(cr);
         layout.set_text(String(this.percentage), -1);
-        layout.set_font_description(themeNode.get_font());
+        const desc = themeNode.get_font();
+        if (this.statusStyle === BStatusStyle.PORTRAIT) {
+          desc.set_size(Math.round((5 / 8) * desc.get_size()));
+        }
+        layout.set_font_description(desc);
         layout.set_alignment(1);
         PangoCairo.update_layout(cr, layout);
 
@@ -163,7 +198,7 @@ var BatteryDrawIcon = GObject.registerClass(
 
         PangoCairo.show_layout(cr, layout);
       }
-      if (bgSource !== null) {
+      if (bgSource !== null && this.statusStyle !== BStatusStyle.PORTRAIT) {
         cr.restore();
         cr.setSource(bgSource);
         cr.setOperator(Cairo.Operator.DEST_OVER);
