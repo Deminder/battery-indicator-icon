@@ -1,12 +1,11 @@
 # SPDX-FileCopyrightText: 2023 Deminder <tremminder@gmail.com>
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-26 17:16+0100\n"
+"POT-Creation-Date: 2023-01-28 00:21+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -16,39 +15,46 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.1.1\n"
 
-#: src/prefs.js:39
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:12
-msgid "Show battery percentage text in icon"
-msgstr "Zeige Batterie-Prozent-Text im Icon"
-
 #: src/prefs.js:41
+msgid "Battery percentage text"
+msgstr "Prozent-Text der Batterie"
+
+#: src/prefs.js:43
 msgid "Hidden"
 msgstr "Unsichtbar"
 
-#: src/prefs.js:42
+#: src/prefs.js:44
 msgid "Inside the icon"
 msgstr "In dem Icon"
 
-#: src/prefs.js:43
+#: src/prefs.js:45
 msgid "Next to the icon"
 msgstr "Neben dem Icon"
 
-#: src/prefs.js:59
+#: src/prefs.js:61
 msgid "Battery status icon style"
 msgstr "Art des Batterie-Status-Icons"
 
-#: src/prefs.js:61
+#: src/prefs.js:63
 msgid "Icon portrait"
 msgstr "Porträticon"
 
-#: src/prefs.js:62
+#: src/prefs.js:64
+msgid "Plain icon portrait"
+msgstr "Porträticon"
+
+#: src/prefs.js:65
 msgid "Circle"
 msgstr "Kreis"
 
-#: src/prefs.js:63
+#: src/prefs.js:66
 msgid "Text"
 msgstr "Text"
 
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:7
-msgid "Battery status icon style (portrait, circle, hidden)"
-msgstr "Art des Batterie-Status-Icons (portrait, circle, hidden)"
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14
+msgid "Battery status icon style (portrait, plainportrait, circle, hidden)"
+msgstr "Art des Batterie-Status-Icons (portrait, plainportrait, circle, hidden)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:19
+msgid "Show battery percentage text in icon"
+msgstr "Zeige Batterie-Prozent-Text im Icon"

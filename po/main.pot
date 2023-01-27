@@ -1,12 +1,14 @@
-# SPDX-FileCopyrightText: 2023 Deminder <tremminder@gmail.com>
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Shutdown Timer
+# This file is distributed under the same license as the Shutdown Timer package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-# SPDX-License-Identifier: GPL-3.0-or-later
-
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Shutdown Timer r1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-26 17:16+0100\n"
+"POT-Creation-Date: 2023-01-28 00:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,39 +17,46 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/prefs.js:39
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:12
-msgid "Show battery percentage text in icon"
-msgstr ""
-
 #: src/prefs.js:41
-msgid "Hidden"
-msgstr ""
-
-#: src/prefs.js:42
-msgid "Inside the icon"
+msgid "Battery percentage text"
 msgstr ""
 
 #: src/prefs.js:43
+msgid "Hidden"
+msgstr ""
+
+#: src/prefs.js:44
+msgid "Inside the icon"
+msgstr ""
+
+#: src/prefs.js:45
 msgid "Next to the icon"
 msgstr ""
 
-#: src/prefs.js:59
+#: src/prefs.js:61
 msgid "Battery status icon style"
 msgstr ""
 
-#: src/prefs.js:61
+#: src/prefs.js:63
 msgid "Icon portrait"
 msgstr ""
 
-#: src/prefs.js:62
+#: src/prefs.js:64
+msgid "Plain icon portrait"
+msgstr ""
+
+#: src/prefs.js:65
 msgid "Circle"
 msgstr ""
 
-#: src/prefs.js:63
+#: src/prefs.js:66
 msgid "Text"
 msgstr ""
 
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:7
-msgid "Battery status icon style (portrait, circle, hidden)"
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14
+msgid "Battery status icon style (portrait, plainportrait, circle, hidden)"
+msgstr ""
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:19
+msgid "Show battery percentage text in icon"
 msgstr ""
