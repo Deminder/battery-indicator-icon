@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-28 00:21+0100\n"
+"POT-Creation-Date: 2023-01-28 13:31+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -28,33 +28,41 @@ msgid "Inside the icon"
 msgstr "In dem Icon"
 
 #: src/prefs.js:45
+msgid "Inside the icon (vertical)"
+msgstr "In dem Icon (vertikal)"
+
+#: src/prefs.js:46
 msgid "Next to the icon"
 msgstr "Neben dem Icon"
 
-#: src/prefs.js:61
+#: src/prefs.js:67
 msgid "Battery status icon style"
 msgstr "Art des Batterie-Status-Icons"
 
-#: src/prefs.js:63
+#: src/prefs.js:69
 msgid "Icon portrait"
 msgstr "Porträticon"
 
-#: src/prefs.js:64
+#: src/prefs.js:70
 msgid "Plain icon portrait"
 msgstr "Porträticon"
 
-#: src/prefs.js:65
+#: src/prefs.js:71
 msgid "Circle"
 msgstr "Kreis"
 
-#: src/prefs.js:66
+#: src/prefs.js:72
 msgid "Text"
 msgstr "Text"
 
 #: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14
 msgid "Battery status icon style (portrait, plainportrait, circle, hidden)"
-msgstr "Art des Batterie-Status-Icons (portrait, plainportrait, circle, hidden)"
+msgstr ""
+"Art des Batterie-Status-Icons (portrait, plainportrait, circle, hidden)"
 
 #: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:19
-msgid "Show battery percentage text in icon"
-msgstr "Zeige Batterie-Prozent-Text im Icon"
+msgid ""
+"Show battery percentage text in icon (hidden: 0, horizontal: 1, vertical: 2)"
+msgstr ""
+"Zeige Batterie-Prozent-Text im Icon (unsichtbar: 0, horizontal: 1, vertikal: "
+"2)"
