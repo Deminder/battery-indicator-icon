@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2.4.0
+      - name: Setup build dependencies
+        run: |
+          npm install
+          sudo apt-get update
+          sudo apt-get install -y gnome-shell-extensions gettext
+
+      - name: Run linter
+        run: make lint
+
+      - name: Build debug and default zip
+        run: make all
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: target/default/battery-indicator-icon@Deminder.shell-extension.zip
