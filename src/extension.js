@@ -46,8 +46,10 @@ class Extension {
         sysIndicator._drawicon.set({
           inner: charging
             ? BInner.CHARGING
-            : settings.get_boolean('show-icon-text')
+            : settings.get_int('show-icon-text') === 1
             ? BInner.TEXT
+            : settings.get_int('show-icon-text') === 2
+            ? BInner.VTEXT
             : BInner.EMPTY,
           percentage,
           statusStyle,
@@ -80,7 +82,7 @@ class Extension {
     );
     this._settingsIds = [
       settings.connect('changed::status-style', update.bind(this)),
-      settings.connect('changed::icon-percentage-text', update.bind(this)),
+      settings.connect('changed::show-icon-text', update.bind(this)),
     ];
     this._settings = settings;
     update();

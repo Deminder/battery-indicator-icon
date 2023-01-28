@@ -10,6 +10,7 @@ var BInner = {
   EMPTY: 0,
   CHARGING: 1,
   TEXT: 2,
+  VTEXT: 3,
 };
 
 var BStatusStyle = {
@@ -117,12 +118,12 @@ var BatteryDrawIcon = GObject.registerClass(
           cr.stroke();
 
           // Fill battery button
-          cr.rectangle((w - bWidth) / 2, 0, bWidth, bHeight);
+          const eps = one / 4;
+          cr.rectangle((w - bWidth) / 2, 0, bWidth, bHeight + eps);
           cr.fill();
 
           // Fill inner battery
           Clutter.cairo_set_source_color(cr, fillColor);
-          const eps = one / 4;
           const border = strokeWidth / 2 - eps;
           const ih = bh - border * 2;
           cr.rectangle(
@@ -161,14 +162,17 @@ var BatteryDrawIcon = GObject.registerClass(
 
       if (this.inner === BInner.CHARGING) {
         // Show charging bolt
-        const boltHeight = (h - strokeWidth - one) * 0.75;
+        const boltHeight = (h - strokeWidth) * 0.65;
         const boltAspect = 0.7333;
         const boltWidth = boltHeight * boltAspect;
         cr.translate((one + w - boltWidth) / 2.0, (one + h - boltHeight) / 2.0);
         cr.scale(boltWidth / 1000, boltHeight / 1000);
         this._bolt_path.to_cairo_path(cr);
         cr.fill();
-      } else if (this.percentage < 100 && this.inner === BInner.TEXT) {
+      } else if (
+        this.percentage < 100 &&
+        (this.inner === BInner.TEXT || this.inner === BInner.VTEXT)
+      ) {
         // Show inner percentage text
 
         if (this.statusStyle === BStatusStyle.PLAINPORTRAIT) {
@@ -181,7 +185,11 @@ var BatteryDrawIcon = GObject.registerClass(
         const layout = PangoCairo.create_layout(cr);
         layout.set_text(String(this.percentage), -1);
         const desc = themeNode.get_font();
-        if (this.statusStyle === BStatusStyle.PORTRAIT) {
+        if (
+          this.statusStyle === BStatusStyle.PORTRAIT &&
+          this.inner !== BInner.VTEXT
+        ) {
+          // Reduce font size to fit into portrait border
           desc.set_size(Math.round((5 / 8) * desc.get_size()));
         }
         layout.set_font_description(desc);
@@ -189,12 +197,15 @@ var BatteryDrawIcon = GObject.registerClass(
         PangoCairo.update_layout(cr, layout);
 
         const [ir, lr] = layout.get_pixel_extents();
-        const ascend = ir.y + ir.height - (lr.y + lr.height);
-        // Move line y down
-        cr.translate(
-          -lr.x + (w - lr.width) / 2.0,
-          -lr.y + (h - lr.height - ascend) / 2.0
-        );
+        const ascend = ir.y + ir.height;
+        // Move to center
+        cr.translate(w / 2.0, h / 2.0);
+        // Rotate text
+        if (this.inner === BInner.VTEXT) {
+          cr.rotate(-0.5 * Math.PI);
+        }
+        // Move to (x,y) = (0,0)
+        cr.translate(-lr.x - lr.width / 2.0, -lr.y - ascend / 2.0);
 
         PangoCairo.show_layout(cr, layout);
       }
@@ -211,8 +222,9 @@ var BatteryDrawIcon = GObject.registerClass(
     }
 
     _sync() {
-      this.set_width(this._theme.scaleFactor * Panel.PANEL_ICON_SIZE);
-      this.set_height(this._theme.scaleFactor * Panel.PANEL_ICON_SIZE);
+      const s = this._theme.scaleFactor;
+      this.set_width(s * Panel.PANEL_ICON_SIZE);
+      this.set_height(s * Panel.PANEL_ICON_SIZE);
       this.queue_repaint();
     }
   }

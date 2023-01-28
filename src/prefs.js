@@ -42,17 +42,23 @@ function fillPreferencesWindow(window) {
     {
       hidden: _('Hidden'),
       inside: _('Inside the icon'),
+      insideVertical: _('Inside the icon (vertical)'),
       nextTo: _('Next to the icon'),
     },
     dsettings.get_boolean('show-battery-percentage')
       ? 'nextTo'
-      : settings.get_boolean('show-icon-text')
+      : settings.get_int('show-icon-text') === 1
       ? 'inside'
+      : settings.get_int('show-icon-text') === 2
+      ? 'insideVertical'
       : 'hidden',
     opt => {
       log('text', opt);
       dsettings.set_boolean('show-battery-percentage', opt === 'nextTo');
-      settings.set_boolean('show-icon-text', opt === 'inside');
+      settings.set_int(
+        'show-icon-text',
+        opt === 'inside' ? 1 : opt === 'insideVertical' ? 2 : 0
+      );
     }
   );
 
