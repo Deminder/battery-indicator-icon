@@ -4,7 +4,6 @@
 
 const { GObject, St, Clutter, PangoCairo } = imports.gi;
 const Cairo = imports.cairo;
-const Panel = imports.ui.panel;
 
 var BInner = {
   EMPTY: 0,
@@ -52,21 +51,20 @@ var BatteryDrawIcon = GObject.registerClass(
         y_align: Clutter.ActorAlign.CENTER,
         style_class: locationClass,
       });
-      this._theme = St.ThemeContext.get_for_stage(global.stage);
-      this._theme.connectObject(
-        'notify::scale-factor',
-        this._sync.bind(this),
-        this
-      );
 
       // https://github.com/LineageOS/android_frameworks_base/blob/-/packages/SettingsLib/src/com/android/settingslib/graph/BatteryMeterDrawableBase.java#L158
       this._bolt_path = Clutter.Path.new_with_description(
         'M 165 0 L 887 0 L 455 368 L 1000 368 L 9 1000 L 355 475 L 0 475 z'
       );
-      this.connect('notify::inner', this._sync.bind(this));
-      this.connect('notify::percentage', this._sync.bind(this));
-      this.connect('notify::status-style', this._sync.bind(this));
-      this._sync();
+      for (const signal of [
+        'notify::inner',
+        'style-changed',
+        'notify::percentage',
+        'notify::status-style',
+      ]) {
+        this.connect(signal, () => this.queue_repaint());
+      }
+      this.queue_repaint();
     }
 
     vfunc_repaint() {
@@ -162,10 +160,10 @@ var BatteryDrawIcon = GObject.registerClass(
 
       if (this.inner === BInner.CHARGING) {
         // Show charging bolt
-        const boltHeight = (h - strokeWidth) * 0.65;
+        const boltHeight = (h - strokeWidth) * 0.6;
         const boltAspect = 0.7333;
         const boltWidth = boltHeight * boltAspect;
-        cr.translate((one + w - boltWidth) / 2.0, (one + h - boltHeight) / 2.0);
+        cr.translate((w - boltWidth * 0.9) / 2.0, (h - boltHeight * 0.9) / 2.0);
         cr.scale(boltWidth / 1000, boltHeight / 1000);
         this._bolt_path.to_cairo_path(cr);
         cr.fill();
@@ -218,13 +216,6 @@ var BatteryDrawIcon = GObject.registerClass(
       // Explicitly tell Cairo to free the context memory
       // https://gjs.guide/guides/gjs/memory-management.html#cairo
       cr.$dispose();
-    }
-
-    _sync() {
-      const s = this._theme.scaleFactor;
-      this.set_width(s * Panel.PANEL_ICON_SIZE);
-      this.set_height(s * Panel.PANEL_ICON_SIZE);
-      this.queue_repaint();
     }
   }
 );
