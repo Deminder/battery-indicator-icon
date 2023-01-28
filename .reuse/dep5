@@ -3,8 +3,10 @@ Upstream-Name: battery-indicator-icon
 Upstream-Contact: Deminder <tremminder@gmail.com>
 Source: https://github.com/Deminder/battery-indicator-icon
 
-# Sample paragraph, commented out:
-#
-# Files: src/*
-# Copyright: $YEAR $NAME <$CONTACT>
-# License: ...
+Files: po/*.po
+Copyright: Translators
+License: CC-BY-SA-4.0
+
+Files: data/*.png
+Copyright: 2023 Deminder <tremminder@gmail.com>
+License: CC-BY-SA-4.0
