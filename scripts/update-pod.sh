@@ -15,9 +15,8 @@ cd "$( cd "$( dirname "$0" )" && pwd )/.."
 
 xgettext \
     --from-code=UTF-8 \
-    --copyright-holder="Shutdown Timer" \
-    --package-name="Shutdown Timer" \
-    --package-version="r`grep -oP '^ *?\"version\": *?\K(\d+)' src/metadata.json`" \
+    --package-name="battery-indicator-icon" \
+    --package-version="v`grep -oP '^ *?\"version\": *?\K(\d+)' src/metadata.json`" \
     --keyword="gtxt" \
     --keyword="_n:1,2" \
     --keyword="C_:1c,2" \

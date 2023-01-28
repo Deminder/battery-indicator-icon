@@ -22,6 +22,5 @@ git add "$METADATA_FILE"
 
 reuse lint
 
-
 git commit -am "bump version to $VERSION"
 git tag -a "v$VERSION" -m "Release version $VERSION"

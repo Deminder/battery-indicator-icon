@@ -1,14 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Shutdown Timer
-# This file is distributed under the same license as the Shutdown Timer package.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the battery-indicator-icon package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Shutdown Timer r1\n"
+"Project-Id-Version: battery-indicator-icon v1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-28 13:31+0100\n"
+"POT-Creation-Date: 2023-01-28 23:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,44 +17,44 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/prefs.js:41
-msgid "Battery percentage text"
-msgstr ""
-
-#: src/prefs.js:43
+#: src/prefs.js:39
 msgid "Hidden"
 msgstr ""
 
-#: src/prefs.js:44
+#: src/prefs.js:40
 msgid "Inside the icon"
 msgstr ""
 
-#: src/prefs.js:45
+#: src/prefs.js:41
 msgid "Inside the icon (vertical)"
 msgstr ""
 
-#: src/prefs.js:46
+#: src/prefs.js:42
 msgid "Next to the icon"
 msgstr ""
 
-#: src/prefs.js:67
-msgid "Battery status icon style"
+#: src/prefs.js:44
+msgid "Battery percentage text"
 msgstr ""
 
-#: src/prefs.js:69
+#: src/prefs.js:47
 msgid "Icon portrait"
 msgstr ""
 
-#: src/prefs.js:70
+#: src/prefs.js:48
 msgid "Plain icon portrait"
 msgstr ""
 
-#: src/prefs.js:71
+#: src/prefs.js:49
 msgid "Circle"
 msgstr ""
 
-#: src/prefs.js:72
+#: src/prefs.js:50
 msgid "Text"
+msgstr ""
+
+#: src/prefs.js:52
+msgid "Battery status icon style"
 msgstr ""
 
 #: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14

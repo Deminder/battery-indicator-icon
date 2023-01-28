@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-28 13:31+0100\n"
+"POT-Creation-Date: 2023-01-28 22:40+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -12,45 +12,45 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.1.1\n"
 
-#: src/prefs.js:41
-msgid "Battery percentage text"
-msgstr "Prozent-Text der Batterie"
-
-#: src/prefs.js:43
+#: src/prefs.js:39
 msgid "Hidden"
 msgstr "Unsichtbar"
 
-#: src/prefs.js:44
+#: src/prefs.js:40
 msgid "Inside the icon"
 msgstr "In dem Icon"
 
-#: src/prefs.js:45
+#: src/prefs.js:41
 msgid "Inside the icon (vertical)"
 msgstr "In dem Icon (vertikal)"
 
-#: src/prefs.js:46
+#: src/prefs.js:42
 msgid "Next to the icon"
 msgstr "Neben dem Icon"
 
-#: src/prefs.js:67
-msgid "Battery status icon style"
-msgstr "Art des Batterie-Status-Icons"
+#: src/prefs.js:44
+msgid "Battery percentage text"
+msgstr "Prozent-Text der Batterie"
 
-#: src/prefs.js:69
+#: src/prefs.js:47
 msgid "Icon portrait"
 msgstr "Porträticon"
 
-#: src/prefs.js:70
+#: src/prefs.js:48
 msgid "Plain icon portrait"
 msgstr "Porträticon"
 
-#: src/prefs.js:71
+#: src/prefs.js:49
 msgid "Circle"
 msgstr "Kreis"
 
-#: src/prefs.js:72
+#: src/prefs.js:50
 msgid "Text"
 msgstr "Text"
+
+#: src/prefs.js:52
+msgid "Battery status icon style"
+msgstr "Art des Batterie-Status-Icons"
 
 #: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14
 msgid "Battery status icon style (portrait, plainportrait, circle, hidden)"
