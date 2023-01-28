@@ -12,19 +12,16 @@ function init() {
   ExtensionUtils.initTranslations();
 }
 
-function createComboRow(title, options, selection, onSelected) {
-  const keys = Object.keys(options);
-  const aid = keys.indexOf(selection);
+function createComboRow(title, options) {
   const model = new Gtk.StringList();
-  for (const k of keys) {
-    model.append(options[k]);
+  for (const opt of Object.values(options)) {
+    model.append(opt);
   }
   const row = new Adw.ComboRow({
     title,
     model,
-    selected: aid !== -1 ? aid : keys.length,
+    selected: 0,
   });
-  row.connect('notify::selected', () => onSelected(keys[row.selected]));
   return row;
 }
 
@@ -37,63 +34,73 @@ function fillPreferencesWindow(window) {
   const page = new Adw.PreferencesPage();
   const group = new Adw.PreferencesGroup();
   page.add(group);
-  const textRow = createComboRow(
-    _('Battery percentage text'),
-    {
-      hidden: _('Hidden'),
-      inside: _('Inside the icon'),
-      insideVertical: _('Inside the icon (vertical)'),
-      nextTo: _('Next to the icon'),
-    },
-    dsettings.get_boolean('show-battery-percentage')
-      ? 'nextTo'
-      : settings.get_int('show-icon-text') === 1
-      ? 'inside'
-      : settings.get_int('show-icon-text') === 2
-      ? 'insideVertical'
-      : 'hidden',
-    opt => {
-      log('text', opt);
-      dsettings.set_boolean('show-battery-percentage', opt === 'nextTo');
-      settings.set_int(
-        'show-icon-text',
-        opt === 'inside' ? 1 : opt === 'insideVertical' ? 2 : 0
-      );
-    }
-  );
 
-  const s = settings.get_string('status-style');
-  const styleRow = createComboRow(
-    _('Battery status icon style'),
-    {
-      portrait: _('Icon portrait'),
-      plainportrait: _('Plain icon portrait'),
-      circle: _('Circle'),
-      text: _('Text'),
-    },
-    s !== 'hidden' ? s : 'text',
-    opt => {
-      log('style', opt);
-      if (opt !== 'text') {
-        settings.set_string('status-style', opt);
-      } else {
-        // only show text
-        settings.set_string('status-style', 'hidden');
-        dsettings.set_boolean('show-battery-percentage', true);
-      }
-    }
-  );
-  const update = () => {
-    textRow.sensitive = settings.get_string('status-style') !== 'hidden';
+  const textOpts = {
+    hidden: _('Hidden'),
+    inside: _('Inside the icon'),
+    insideVertical: _('Inside the icon (vertical)'),
+    nextTo: _('Next to the icon'),
+  };
+  const textRow = createComboRow(_('Battery percentage text'), textOpts);
+
+  const styleOpts = {
+    portrait: _('Icon portrait'),
+    plainportrait: _('Plain icon portrait'),
+    circle: _('Circle'),
+    text: _('Text'),
+  };
+  const styleRow = createComboRow(_('Battery status icon style'), styleOpts);
+
+  const updateOpt = () => {
+    // GUI update
+    const textOpt = Object.keys(textOpts)[textRow.selected];
+    const styleOpt = Object.keys(styleOpts)[styleRow.selected];
     dsettings.set_boolean(
       'show-battery-percentage',
-      textRow.selected === 3 // Selected `text`
+      textOpt === 'nextTo' || styleOpt === 'text'
+    );
+    settings.set_int(
+      'show-icon-text',
+      textOpt === 'inside' ? 1 : textOpt === 'insideVertical' ? 2 : 0
+    );
+    settings.set_string(
+      'status-style',
+      styleOpt !== 'text' ? styleOpt : 'hidden'
     );
   };
-  settings.connect('changed::status-style', update);
-  update();
+  const updateSetting = () => {
+    // Setting update
+    const s = settings.get_string('status-style');
+    const styleOpt = s !== 'hidden' ? s : 'text';
+    styleRow.selected = Object.keys(styleOpts).indexOf(styleOpt);
+
+    const showIcon = styleOpt !== 'text';
+    textRow.sensitive = showIcon;
+    const textOpt =
+      settings.get_int('show-icon-text') === 1
+        ? 'inside'
+        : settings.get_int('show-icon-text') === 2
+        ? 'insideVertical'
+        : dsettings.get_boolean('show-battery-percentage')
+        ? 'nextTo'
+        : 'hidden';
+    textRow.selected = Object.keys(textOpts).indexOf(textOpt);
+  };
+  const handlerIds = [
+    settings.connect('changed::status-style', updateSetting),
+    settings.connect('changed::show-battery-percentage', updateSetting),
+  ];
+  updateSetting();
+  styleRow.connect('notify::selected', updateOpt);
+  textRow.connect('notify::selected', updateOpt);
+
   group.add(styleRow);
   group.add(textRow);
+  page.connect('destroy', () => {
+    for (const hid of handlerIds) {
+      settings.disconnect(hid);
+    }
+  });
 
   window.default_width = 500;
   window.default_height = 220;

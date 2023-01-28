@@ -197,7 +197,6 @@ var BatteryDrawIcon = GObject.registerClass(
         PangoCairo.update_layout(cr, layout);
 
         const [ir, lr] = layout.get_pixel_extents();
-        const ascend = ir.y + ir.height;
         // Move to center
         cr.translate(w / 2.0, h / 2.0);
         // Rotate text
@@ -205,7 +204,7 @@ var BatteryDrawIcon = GObject.registerClass(
           cr.rotate(-0.5 * Math.PI);
         }
         // Move to (x,y) = (0,0)
-        cr.translate(-lr.x - lr.width / 2.0, -lr.y - ascend / 2.0);
+        cr.translate(-lr.x - lr.width / 2.0, -lr.y - ir.y - ir.height / 2.0);
 
         PangoCairo.show_layout(cr, layout);
       }
