@@ -19,7 +19,7 @@ class Extension {
 
   enable() {
     if (this._proxy !== null) {
-      // Already enabled
+      // Extension already enabled
       return;
     }
     const settings = ExtensionUtils.getSettings();
@@ -124,8 +124,11 @@ class Extension {
   }
 
   disable() {
+    // Unlock-dialog session-mode required:
+    // since the battery indicator is also visible in the unlock-dialog.
+    // The user most likely expects the custom icon to appear in the unlock-dialog.
     if (this._proxy === null) {
-      // Already disabled
+      // Extension already disabled
       return;
     }
     const sysIndicator = Main.panel.statusArea.quickSettings._system;
