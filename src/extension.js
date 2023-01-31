@@ -61,6 +61,8 @@ class Extension {
           statusStyle:
             statusStyleStr === 'bold'
               ? BStatusStyle.BOLD
+              : statusStyleStr === 'slim'
+              ? BStatusStyle.SLIM
               : statusStyleStr === 'plain'
               ? BStatusStyle.PLAIN
               : BStatusStyle.CIRCLE,

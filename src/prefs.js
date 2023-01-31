@@ -45,6 +45,7 @@ function fillPreferencesWindow(window) {
 
   const styleOpts = {
     bold: _('Bold'),
+    slim: _('Slim'),
     plain: _('Plain'),
     circle: _('Circle'),
     text: _('Text'),

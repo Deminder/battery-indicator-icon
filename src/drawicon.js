@@ -14,6 +14,7 @@ var BInner = {
 
 var BStatusStyle = {
   BOLD: 0,
+  SLIM: 1,
   PLAIN: 2,
   CIRCLE: 3,
   HIDE: 4,
@@ -87,22 +88,28 @@ var BatteryDrawIcon = GObject.registerClass(
       const strokeWidth = size / 6.5;
       const one = h / 16;
 
+      const slim = this.statusStyle === BStatusStyle.SLIM;
       const fColor = themeNode.get_foreground_color();
       const bColor = fColor.darken().darken();
       const fillColor =
-        this.percentage > 15 ? fColor : themeNode.get_icon_colors().warning;
+        this.percentage > 15
+          ? slim
+            ? bColor
+            : fColor
+          : themeNode.get_icon_colors().warning;
       cr.save();
       const verticalBodyWidth = w * 0.58;
       const horizontalBodyHeight = h;
-      const cornerRadius = 1.5 * one;
-      const buttonLengthFrac = 0.44;
+      const cornerRadius = slim ? strokeWidth : 1.5 * one;
+      const slimThinkness = strokeWidth / 4;
+      const buttonLengthFrac = slim ? 0.3 : 0.44;
       // Battery button width and height (vertical: V/horizontal: H)
       const [bWidthV, bHeightV] = [
         verticalBodyWidth * buttonLengthFrac,
-        h * 0.1,
+        slim ? slimThinkness * 2 : h * 0.1,
       ];
       const [bWidthH, bHeightH] = [
-        w * 0.1,
+        slim ? slimThinkness * 2 : w * 0.1,
         horizontalBodyHeight * buttonLengthFrac,
       ];
       let bgSource = null;
@@ -110,6 +117,7 @@ var BatteryDrawIcon = GObject.registerClass(
       Clutter.cairo_set_source_color(cr, bColor);
       if (
         this.statusStyle === BStatusStyle.BOLD ||
+        slim ||
         this.statusStyle === BStatusStyle.PLAIN
       ) {
         const roundedRect = (x, y, bW, bH, r) => {
@@ -147,30 +155,61 @@ var BatteryDrawIcon = GObject.registerClass(
         cr.fillPreserve();
         bgSource = cr.popGroup();
 
-        if (this.statusStyle === BStatusStyle.BOLD) {
+        if (this.statusStyle === BStatusStyle.BOLD || slim) {
           cr.clipPreserve();
           // Outline battery
           Clutter.cairo_set_source_color(cr, fColor);
-          cr.setLineWidth(strokeWidth);
+          cr.setLineWidth(slim ? slimThinkness * 2 : strokeWidth);
           cr.stroke();
 
           const eps = one / 4;
-          // Fill battery button
-          if (verticalBattery) {
-            cr.rectangle((w - bWidthV) / 2, 0, bWidthV, bHeightV + eps);
+          if (slim) {
+            // Clear button stroke
+            cr.setOperator(Cairo.Operator.CLEAR);
+            if (verticalBattery) {
+              cr.rectangle(0, 0, w, bHeightV);
+            } else {
+              cr.rectangle(w - bWidthH, 0, bWidthH, h);
+            }
+            cr.fill();
+
+            // Draw battery button line
+            cr.setOperator(Cairo.Operator.OVER);
+            // Round line cap
+            cr.setLineWidth(slimThinkness);
+            cr.setLineCap(1);
+            if (verticalBattery) {
+              cr.moveTo((w - bWidthV + slimThinkness) / 2, slimThinkness / 2);
+              cr.lineTo((w + bWidthV - slimThinkness) / 2, slimThinkness / 2);
+            } else {
+              cr.moveTo(
+                w - slimThinkness / 2,
+                (h - bHeightH + slimThinkness) / 2
+              );
+              cr.lineTo(
+                w - slimThinkness / 2,
+                (h + bHeightH - slimThinkness) / 2
+              );
+            }
+            cr.stroke();
           } else {
-            cr.rectangle(
-              w - bWidthH - eps,
-              (h - bHeightH) / 2,
-              bWidthH + eps,
-              bHeightH
-            );
+            // Fill battery button
+            if (verticalBattery) {
+              cr.rectangle((w - bWidthV) / 2, 0, bWidthV, bHeightV + eps);
+            } else {
+              cr.rectangle(
+                w - bWidthH - eps,
+                (h - bHeightH) / 2,
+                bWidthH + eps,
+                bHeightH
+              );
+            }
+            cr.fill();
           }
-          cr.fill();
 
           // Fill inner battery
           Clutter.cairo_set_source_color(cr, fillColor);
-          const border = strokeWidth / 2 - eps;
+          const border = slim ? slimThinkness * 2.5 : strokeWidth / 2 - eps;
           if (verticalBattery) {
             const ih = h - bHeightV - border * 2;
             const [x, y] = [(w - verticalBodyWidth) / 2, bHeightV];
@@ -223,7 +262,7 @@ var BatteryDrawIcon = GObject.registerClass(
       }
       cr.restore();
 
-      cr.setOperator(Cairo.Operator.DIFFERENCE);
+      cr.setOperator(slim ? Cairo.Operator.OVER : Cairo.Operator.DIFFERENCE);
       Clutter.cairo_set_source_color(cr, fColor);
 
       if (this.inner === BInner.CHARGING) {
@@ -290,7 +329,8 @@ var BatteryDrawIcon = GObject.registerClass(
       }
       if (
         bgSource !== null &&
-        this.statusStyle !== BStatusStyle.BOLD
+        this.statusStyle !== BStatusStyle.BOLD &&
+        !slim
       ) {
         cr.restore();
         cr.setSource(bgSource);
