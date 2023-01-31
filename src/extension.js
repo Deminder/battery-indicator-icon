@@ -45,7 +45,7 @@ class Extension {
 
         // Update properties of BatteryDrawIcons
         const height = this._theme.scaleFactor * Panel.PANEL_ICON_SIZE;
-        const width = height;
+        const width = Math.round(height * settings.get_double('icon-scale'));
         let charging = this._proxy.State === UPower.DeviceState.CHARGING;
         let percentage = this._proxy.Percentage;
         if (debugMode) {
@@ -87,8 +87,8 @@ class Extension {
           dbgIcon.set({
             ...props,
             inner: BInner.CHARGING,
-            width: 512,
-            height: 512,
+            height: 256,
+            width: 256 * settings.get_double('icon-scale'),
           });
           const monitor = Main.layoutManager.primaryMonitor;
           dbgIcon.set_position(
@@ -120,6 +120,7 @@ class Extension {
     this._settingsIds = [
       'status-style',
       'show-icon-text',
+      'icon-scale',
       'icon-orientation',
     ].map(prop => settings.connect(`changed::${prop}`, update.bind(this)));
     this._settings = settings;

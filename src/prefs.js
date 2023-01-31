@@ -51,6 +51,13 @@ function fillPreferencesWindow(window) {
   };
   const styleRow = createComboRow(_('Battery status icon style'), styleOpts);
 
+  const scaleOpts = {
+    square: _('Default'),
+    golden: _('Wide'),
+    double: _('Extra wide'),
+  };
+  const scalingRow = createComboRow(_('Horizontal scale'), scaleOpts);
+
   const orientationOpts = {
     vertical: _('Vertical'),
     horizontal: _('Horizontal'),
@@ -61,6 +68,7 @@ function fillPreferencesWindow(window) {
     // GUI update
     const textOpt = Object.keys(textOpts)[textRow.selected];
     const styleOpt = Object.keys(styleOpts)[styleRow.selected];
+    const scaleOpt = Object.keys(scaleOpts)[scalingRow.selected];
     const orientOpt = Object.keys(orientationOpts)[orientationRow.selected];
     dsettings.set_boolean(
       'show-battery-percentage',
@@ -103,10 +111,17 @@ function fillPreferencesWindow(window) {
     const orientOpt = settings.get_string('icon-orientation');
     orientationRow.selected = Object.keys(orientationOpts).indexOf(orientOpt);
 
+    // Horizontal scaling
+    scalingRow.sensitive = showIcon;
+    const scale = settings.get_double('icon-scale');
+    const scaleOpt =
+      scale === 1.618 ? 'golden' : scale === 2 ? 'double' : 'square';
+    scalingRow.selected = Object.keys(scaleOpts).indexOf(scaleOpt);
   };
   const handlerIds = [
     'status-style',
     'show-battery-percentage',
+    'icon-scale',
     'icon-orientation',
   ].map(prop => settings.connect(`changed::${prop}`, updateSetting));
   updateSetting();

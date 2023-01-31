@@ -23,5 +23,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <default>"vertical"</default>
       <summary>Icon orientation (vertical, horizontal)</summary>
     </key>
+
+    <key type="d" name="icon-scale">
+      <default>1</default>
+      <summary>Icon scale as aspect ratio width/height</summary>
+    </key>
   </schema>
 </schemalist>
