@@ -23,6 +23,16 @@ class Extension {
       return;
     }
     const settings = ExtensionUtils.getSettings();
+    // Port legacy setting names
+    const legacyProps = {
+      portrait: 'bold',
+      plainportrait: 'plain',
+    };
+    const stylePropName = settings.get_string('status-style');
+    if (stylePropName in legacyProps) {
+      settings.set_string('status-style', legacyProps[stylePropName]);
+    }
+
     const sysIndicator = Main.panel.statusArea.quickSettings._system;
     const { powerToggle } = sysIndicator._systemItem;
     const proxy = powerToggle._proxy;
@@ -49,10 +59,10 @@ class Extension {
           width,
           percentage,
           statusStyle:
-            statusStyleStr === 'portrait'
-              ? BStatusStyle.PORTRAIT
-              : statusStyleStr === 'plainportrait'
-              ? BStatusStyle.PLAINPORTRAIT
+            statusStyleStr === 'bold'
+              ? BStatusStyle.BOLD
+              : statusStyleStr === 'plain'
+              ? BStatusStyle.PLAIN
               : BStatusStyle.CIRCLE,
           inner: charging
             ? BInner.CHARGING
@@ -62,6 +72,7 @@ class Extension {
             ? BInner.VTEXT
             : BInner.EMPTY,
           visible: statusStyleStr !== 'hidden',
+          vertical: settings.get_string('icon-orientation') === 'vertical',
         };
         sysIndicator._drawicon.set(props);
         powerToggle._drawicon.set({
@@ -107,9 +118,10 @@ class Extension {
       update.bind(this)
     );
     this._settingsIds = [
-      settings.connect('changed::status-style', update.bind(this)),
-      settings.connect('changed::show-icon-text', update.bind(this)),
-    ];
+      'status-style',
+      'show-icon-text',
+      'icon-orientation',
+    ].map(prop => settings.connect(`changed::${prop}`, update.bind(this)));
     this._settings = settings;
 
     if (debugMode) {

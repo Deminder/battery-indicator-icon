@@ -44,17 +44,24 @@ function fillPreferencesWindow(window) {
   const textRow = createComboRow(_('Battery percentage text'), textOpts);
 
   const styleOpts = {
-    portrait: _('Icon portrait'),
-    plainportrait: _('Plain icon portrait'),
+    bold: _('Bold'),
+    plain: _('Plain'),
     circle: _('Circle'),
     text: _('Text'),
   };
   const styleRow = createComboRow(_('Battery status icon style'), styleOpts);
 
+  const orientationOpts = {
+    vertical: _('Vertical'),
+    horizontal: _('Horizontal'),
+  };
+  const orientationRow = createComboRow(_('Orientation'), orientationOpts);
+
   const updateOpt = () => {
     // GUI update
     const textOpt = Object.keys(textOpts)[textRow.selected];
     const styleOpt = Object.keys(styleOpts)[styleRow.selected];
+    const orientOpt = Object.keys(orientationOpts)[orientationRow.selected];
     dsettings.set_boolean(
       'show-battery-percentage',
       textOpt === 'nextTo' || styleOpt === 'text'
@@ -66,6 +73,11 @@ function fillPreferencesWindow(window) {
     settings.set_string(
       'status-style',
       styleOpt !== 'text' ? styleOpt : 'hidden'
+    );
+    settings.set_string('icon-orientation', orientOpt);
+    settings.set_double(
+      'icon-scale',
+      scaleOpt === 'golden' ? 1.618 : scaleOpt === 'double' ? 2 : 1
     );
   };
   const updateSetting = () => {
@@ -85,17 +97,23 @@ function fillPreferencesWindow(window) {
         ? 'nextTo'
         : 'hidden';
     textRow.selected = Object.keys(textOpts).indexOf(textOpt);
+
+    // Orientation
+    orientationRow.sensitive = showIcon && styleOpt !== 'circle';
+    const orientOpt = settings.get_string('icon-orientation');
+    orientationRow.selected = Object.keys(orientationOpts).indexOf(orientOpt);
+
   };
   const handlerIds = [
-    settings.connect('changed::status-style', updateSetting),
-    settings.connect('changed::show-battery-percentage', updateSetting),
-  ];
+    'status-style',
+    'show-battery-percentage',
+    'icon-orientation',
+  ].map(prop => settings.connect(`changed::${prop}`, updateSetting));
   updateSetting();
-  styleRow.connect('notify::selected', updateOpt);
-  textRow.connect('notify::selected', updateOpt);
-
-  group.add(styleRow);
-  group.add(textRow);
+  for (const r of [styleRow, textRow, scalingRow, orientationRow]) {
+    r.connect('notify::selected', updateOpt);
+    group.add(r);
+  }
   page.connect('destroy', () => {
     for (const hid of handlerIds) {
       settings.disconnect(hid);
@@ -103,6 +121,6 @@ function fillPreferencesWindow(window) {
   });
 
   window.default_width = 500;
-  window.default_height = 220;
+  window.default_height = 320;
   window.add(page);
 }
