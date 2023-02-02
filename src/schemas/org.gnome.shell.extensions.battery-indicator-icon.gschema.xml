@@ -10,8 +10,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <schema path="/org/gnome/shell/extensions/battery-indicator-icon/" id="org.gnome.shell.extensions.battery-indicator-icon">
 
     <key type="s" name="status-style">
-      <default>"portrait"</default>
-      <summary>Battery status icon style (portrait, slimportrait, plainportrait, circle, hidden)</summary>
+      <default>"bold"</default>
+      <summary>Battery status icon style (bold, slim, plain, circle, hidden)</summary>
     </key>
 
     <key type="i" name="show-icon-text">

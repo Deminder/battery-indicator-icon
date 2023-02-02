@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-28 22:40+0100\n"
+"POT-Creation-Date: 2023-02-02 13:06+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -12,50 +12,83 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.1.1\n"
 
-#: src/prefs.js:39
-msgid "Hidden"
-msgstr "Unsichtbar"
-
-#: src/prefs.js:40
-msgid "Inside the icon"
-msgstr "In dem Icon"
-
-#: src/prefs.js:41
-msgid "Inside the icon (vertical)"
-msgstr "In dem Icon (vertikal)"
-
-#: src/prefs.js:42
-msgid "Next to the icon"
-msgstr "Neben dem Icon"
-
-#: src/prefs.js:44
-msgid "Battery percentage text"
-msgstr "Prozent-Text der Batterie"
-
-#: src/prefs.js:47
-msgid "Icon portrait"
-msgstr "Porträticon"
-
-#: src/prefs.js:48
-msgid "Plain icon portrait"
-msgstr "Porträticon"
-
-#: src/prefs.js:49
-msgid "Circle"
-msgstr "Kreis"
-
-#: src/prefs.js:50
-msgid "Text"
-msgstr "Text"
-
-#: src/prefs.js:52
+#: src/prefs.js:28
 msgid "Battery status icon style"
 msgstr "Art des Batterie-Status-Icons"
 
+#: src/prefs.js:29
+msgid "Bold"
+msgstr "Kräftig"
+
+#: src/prefs.js:30
+msgid "Slim"
+msgstr "Schlank"
+
+#: src/prefs.js:31
+msgid "Plain"
+msgstr "Glatt"
+
+#: src/prefs.js:32
+msgid "Circle"
+msgstr "Kreis"
+
+#: src/prefs.js:33
+msgid "Text"
+msgstr "Text"
+
+#: src/prefs.js:36
+msgid "Battery percentage text"
+msgstr "Prozent-Text der Batterie"
+
+#: src/prefs.js:37
+msgid "Hidden"
+msgstr "Unsichtbar"
+
+#: src/prefs.js:38
+msgid "Inside the icon"
+msgstr "In dem Icon"
+
+#: src/prefs.js:39
+msgid "Inside the icon (vertical)"
+msgstr "In dem Icon (vertikal)"
+
+#: src/prefs.js:40
+msgid "Next to the icon"
+msgstr "Neben dem Icon"
+
+#: src/prefs.js:43
+msgid "Horizontal scale"
+msgstr "Horizontale Skalierung"
+
+#: src/prefs.js:44
+msgid "Default"
+msgstr "Normal"
+
+#: src/prefs.js:45
+msgid "Wide"
+msgstr "Breit"
+
+#: src/prefs.js:46
+msgid "Extra wide"
+msgstr "Extra breit"
+
+#: src/prefs.js:49
+msgid "Orientation"
+msgstr "Orientierung"
+
+#: src/prefs.js:50
+msgid "Vertical"
+msgstr "Vertikal"
+
+#: src/prefs.js:51
+msgid "Horizontal"
+msgstr "Horizontal"
+
 #: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14
-msgid "Battery status icon style (portrait, plainportrait, circle, hidden)"
+msgid ""
+"Battery status icon style (bold, slim, plain, circle, hidden)"
 msgstr ""
-"Art des Batterie-Status-Icons (portrait, plainportrait, circle, hidden)"
+"Art des Batterie-Status-Icons (bold, slim, plain, circle, hidden)"
 
 #: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:19
 msgid ""
@@ -63,3 +96,11 @@ msgid ""
 msgstr ""
 "Zeige Batterie-Prozent-Text im Icon (unsichtbar: 0, horizontal: 1, vertikal: "
 "2)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:24
+msgid "Icon orientation (vertical, horizontal)"
+msgstr "Orientierung des Icons (vertical, horizontal)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:30
+msgid "Icon scale as aspect ratio width/height"
+msgstr "Bildseitenverhältnis des Icons Breite/Höhe"
