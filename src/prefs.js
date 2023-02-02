@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Deminder <tremminder@gmail.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-const { Adw, Gio, Gtk } = imports.gi;
+const { Adw, Gio, Gtk, GObject } = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -12,129 +12,171 @@ function init() {
   ExtensionUtils.initTranslations();
 }
 
-function createComboRow(title, options) {
-  const model = new Gtk.StringList();
-  for (const opt of Object.values(options)) {
-    model.append(opt);
+var BatIconPrefsPage = GObject.registerClass(
+  class BatIconPrefsPage extends Adw.PreferencesPage {
+    _init() {
+      super._init();
+
+      this._settings = ExtensionUtils.getSettings();
+      this._dsettings = new Gio.Settings({
+        schema_id: 'org.gnome.desktop.interface',
+      });
+      this._group = new Adw.PreferencesGroup();
+      this.add(this._group);
+      this._rows = {};
+
+      this._addComboRow('style', _('Battery status icon style'), {
+        bold: _('Bold'),
+        slim: _('Slim'),
+        plain: _('Plain'),
+        circle: _('Circle'),
+        text: _('Text'),
+      });
+
+      this._addComboRow('text', _('Battery percentage text'), {
+        hidden: _('Hidden'),
+        inside: _('Inside the icon'),
+        insideVertical: _('Inside the icon (vertical)'),
+        nextTo: _('Next to the icon'),
+      });
+
+      this._addComboRow('scale', _('Horizontal scale'), {
+        square: _('Default'),
+        golden: _('Wide'),
+        double: _('Extra wide'),
+      });
+
+      this._addComboRow('orientation', _('Orientation'), {
+        vertical: _('Vertical'),
+        horizontal: _('Horizontal'),
+      });
+
+      this._settingsSignalIds = [
+        'status-style',
+        'show-battery-percentage',
+        'icon-scale',
+        'icon-orientation',
+      ].map(prop =>
+        this._settings.connect(`changed::${prop}`, this._sync.bind(this))
+      );
+      this.connect('destroy', this._disconnectSettings.bind(this));
+      this._sync();
+    }
+
+    _disconnectSettings() {
+      for (const sid of this._settingsSignalIds) {
+        this.settings.disconnect(sid);
+      }
+      this._settingsSignalIds = [];
+    }
+
+    _sync() {
+      // Setting update
+      this.__syncing = 1;
+      const s = this._settings.get_string('status-style');
+      const styleOpt = s !== 'hidden' ? s : 'text';
+      this.setComboOption('style', styleOpt);
+
+      const showIcon = styleOpt !== 'text';
+      const showText = this._settings.get_int('show-icon-text');
+      this.setComboOption(
+        'text',
+        showText === 1
+          ? 'inside'
+          : showText === 2
+          ? 'insideVertical'
+          : this._dsettings.get_boolean('show-battery-percentage')
+          ? 'nextTo'
+          : 'hidden',
+        showIcon
+      );
+
+      // Orientation
+      this.setComboOption(
+        'orientation',
+        this._settings.get_string('icon-orientation'),
+        showIcon && styleOpt !== 'circle'
+      );
+
+      // Horizontal scaling
+      const scale = this._settings.get_double('icon-scale');
+      this.setComboOption(
+        'scale',
+        scale === 1.618
+          ? 'golden'
+          : scale === 2
+          ? 'double'
+          : scale === 1
+          ? 'square'
+          : 'custom',
+        showIcon
+      );
+      delete this.__syncing;
+      this._updateSettings();
+    }
+
+    setComboOption(prop, opt, sensitive) {
+      const [row, opts] = this._rows[prop];
+      row.selected = Object.keys(opts).indexOf(opt);
+      if (sensitive !== undefined) {
+        row.sensitive = sensitive;
+      }
+    }
+
+    _updateSettings() {
+      if (this.__syncing) {
+        // Skip updating settings during _sync
+        return;
+      }
+      const [textOpt, styleOpt, scaleOpt, orientOpt] = [
+        'text',
+        'style',
+        'scale',
+        'orientation',
+      ].map(prop => {
+        const [row, comboOpts] = this._rows[prop];
+        return Object.keys(comboOpts)[row.selected];
+      });
+      this._dsettings.set_boolean(
+        'show-battery-percentage',
+        textOpt === 'nextTo' || styleOpt === 'text'
+      );
+      this._settings.set_int(
+        'show-icon-text',
+        textOpt === 'inside' ? 1 : textOpt === 'insideVertical' ? 2 : 0
+      );
+      this._settings.set_string(
+        'status-style',
+        styleOpt !== 'text' ? styleOpt : 'hidden'
+      );
+      this._settings.set_string('icon-orientation', orientOpt);
+      if (scaleOpt !== undefined) {
+        this._settings.set_double(
+          'icon-scale',
+          scaleOpt === 'golden' ? 1.618 : scaleOpt === 'double' ? 2 : 1
+        );
+      }
+    }
+
+    _addComboRow(prop, title, options) {
+      const model = new Gtk.StringList();
+      for (const opt of Object.values(options)) {
+        model.append(opt);
+      }
+      const row = new Adw.ComboRow({
+        title,
+        model,
+        selected: 0,
+      });
+      this._rows[prop] = [row, options];
+      row.connect('notify::selected', this._updateSettings.bind(this));
+      this._group.add(row);
+    }
   }
-  const row = new Adw.ComboRow({
-    title,
-    model,
-    selected: 0,
-  });
-  return row;
-}
+);
 
 function fillPreferencesWindow(window) {
-  const settings = ExtensionUtils.getSettings();
-  const dsettings = new Gio.Settings({
-    schema_id: 'org.gnome.desktop.interface',
-  });
-
-  const page = new Adw.PreferencesPage();
-  const group = new Adw.PreferencesGroup();
-  page.add(group);
-
-  const textOpts = {
-    hidden: _('Hidden'),
-    inside: _('Inside the icon'),
-    insideVertical: _('Inside the icon (vertical)'),
-    nextTo: _('Next to the icon'),
-  };
-  const textRow = createComboRow(_('Battery percentage text'), textOpts);
-
-  const styleOpts = {
-    bold: _('Bold'),
-    slim: _('Slim'),
-    plain: _('Plain'),
-    circle: _('Circle'),
-    text: _('Text'),
-  };
-  const styleRow = createComboRow(_('Battery status icon style'), styleOpts);
-
-  const scaleOpts = {
-    square: _('Default'),
-    golden: _('Wide'),
-    double: _('Extra wide'),
-  };
-  const scalingRow = createComboRow(_('Horizontal scale'), scaleOpts);
-
-  const orientationOpts = {
-    vertical: _('Vertical'),
-    horizontal: _('Horizontal'),
-  };
-  const orientationRow = createComboRow(_('Orientation'), orientationOpts);
-
-  const updateOpt = () => {
-    // GUI update
-    const textOpt = Object.keys(textOpts)[textRow.selected];
-    const styleOpt = Object.keys(styleOpts)[styleRow.selected];
-    const scaleOpt = Object.keys(scaleOpts)[scalingRow.selected];
-    const orientOpt = Object.keys(orientationOpts)[orientationRow.selected];
-    dsettings.set_boolean(
-      'show-battery-percentage',
-      textOpt === 'nextTo' || styleOpt === 'text'
-    );
-    settings.set_int(
-      'show-icon-text',
-      textOpt === 'inside' ? 1 : textOpt === 'insideVertical' ? 2 : 0
-    );
-    settings.set_string(
-      'status-style',
-      styleOpt !== 'text' ? styleOpt : 'hidden'
-    );
-    settings.set_string('icon-orientation', orientOpt);
-    settings.set_double(
-      'icon-scale',
-      scaleOpt === 'golden' ? 1.618 : scaleOpt === 'double' ? 2 : 1
-    );
-  };
-  const updateSetting = () => {
-    // Setting update
-    const s = settings.get_string('status-style');
-    const styleOpt = s !== 'hidden' ? s : 'text';
-    styleRow.selected = Object.keys(styleOpts).indexOf(styleOpt);
-
-    const showIcon = styleOpt !== 'text';
-    textRow.sensitive = showIcon;
-    const textOpt =
-      settings.get_int('show-icon-text') === 1
-        ? 'inside'
-        : settings.get_int('show-icon-text') === 2
-        ? 'insideVertical'
-        : dsettings.get_boolean('show-battery-percentage')
-        ? 'nextTo'
-        : 'hidden';
-    textRow.selected = Object.keys(textOpts).indexOf(textOpt);
-
-    // Orientation
-    orientationRow.sensitive = showIcon && styleOpt !== 'circle';
-    const orientOpt = settings.get_string('icon-orientation');
-    orientationRow.selected = Object.keys(orientationOpts).indexOf(orientOpt);
-
-    // Horizontal scaling
-    scalingRow.sensitive = showIcon;
-    const scale = settings.get_double('icon-scale');
-    const scaleOpt =
-      scale === 1.618 ? 'golden' : scale === 2 ? 'double' : 'square';
-    scalingRow.selected = Object.keys(scaleOpts).indexOf(scaleOpt);
-  };
-  const handlerIds = [
-    'status-style',
-    'show-battery-percentage',
-    'icon-scale',
-    'icon-orientation',
-  ].map(prop => settings.connect(`changed::${prop}`, updateSetting));
-  updateSetting();
-  for (const r of [styleRow, textRow, scalingRow, orientationRow]) {
-    r.connect('notify::selected', updateOpt);
-    group.add(r);
-  }
-  page.connect('destroy', () => {
-    for (const hid of handlerIds) {
-      settings.disconnect(hid);
-    }
-  });
+  const page = new BatIconPrefsPage();
 
   window.default_width = 500;
   window.default_height = 320;
