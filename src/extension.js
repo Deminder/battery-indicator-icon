@@ -51,6 +51,7 @@ class Extension {
         if (debugMode) {
           charging = this._debugCounter % 7 === 0;
           percentage = this._debugCounter % 101;
+          // percentage = (this._debugCounter % 30)/2;
         }
         const statusStyleStr = settings.get_string('status-style');
 

@@ -10,9 +10,9 @@
   font-family: 'Droid Sans Mono';
   margin-right: 4px;
   margin-left: 5px;
-  -portrait-font-color: black;
+  -plain-font-color: black;
 }
 
 .battery-quick-toggle {
-  -portrait-font-color: black;
+  -plain-font-color: black;
 }

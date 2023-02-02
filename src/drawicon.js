@@ -85,8 +85,8 @@ var BatteryDrawIcon = GObject.registerClass(
       const verticalBattery =
         this.statusStyle === BStatusStyle.CIRCLE || this.vertical;
       const size = verticalBattery ? h : w;
-      const strokeWidth = size / 6.5;
       const one = h / 16;
+      const strokeWidth = Math.min(4 * one, size / 6.5);
 
       const slim = this.statusStyle === BStatusStyle.SLIM;
       const fColor = themeNode.get_foreground_color();
@@ -106,10 +106,10 @@ var BatteryDrawIcon = GObject.registerClass(
       // Battery button width and height (vertical: V/horizontal: H)
       const [bWidthV, bHeightV] = [
         verticalBodyWidth * buttonLengthFrac,
-        slim ? slimThinkness * 2 : h * 0.1,
+        slim ? slimThinkness * 2 : strokeWidth * 0.6,
       ];
       const [bWidthH, bHeightH] = [
-        slim ? slimThinkness * 2 : w * 0.1,
+        slim ? slimThinkness * 2 : strokeWidth * 0.6,
         horizontalBodyHeight * buttonLengthFrac,
       ];
       let bgSource = null;
@@ -226,7 +226,7 @@ var BatteryDrawIcon = GObject.registerClass(
           Clutter.cairo_set_source_color(cr, fillColor);
           const border = slim ? slimThinkness * 2.5 : strokeWidth / 2 - eps;
           const innerFillRect = slim
-            ? (...rect) => roundedRect(...rect, border/2)
+            ? (...rect) => roundedRect(...rect, border / 2)
             : (...rect) => cr.rectangle(...rect);
           if (verticalBattery) {
             const ih = h - bHeightV - border * 2;
@@ -248,7 +248,7 @@ var BatteryDrawIcon = GObject.registerClass(
           }
           cr.fill();
         } else {
-          // Fill battery (plain portrait)
+          // Fill battery (plain)
           Clutter.cairo_set_source_color(cr, fillColor);
           cr.clip();
           if (verticalBattery) {
@@ -304,7 +304,7 @@ var BatteryDrawIcon = GObject.registerClass(
           cr.setOperator(Cairo.Operator.OVER);
           Clutter.cairo_set_source_color(
             cr,
-            themeNode.get_color('-portrait-font-color')
+            themeNode.get_color('-plain-font-color')
           );
         }
         const layout = PangoCairo.create_layout(cr);
@@ -314,14 +314,15 @@ var BatteryDrawIcon = GObject.registerClass(
         const horizontalText = this.inner !== BInner.VTEXT;
         const extraHorizontalSpace = w > 1.5 * h;
         const extraVerticalSpace =
-          !verticalBattery &&
-          ![BStatusStyle.BOLD, BStatusStyle.CIRCLE].includes(this.statusStyle);
+          !verticalBattery && BStatusStyle.PLAIN === this.statusStyle;
         const fontSizeFraction =
           (horizontalText && extraHorizontalSpace) ||
           (!horizontalText && extraVerticalSpace)
             ? 9 / 8
             : verticalBattery &&
-              this.statusStyle === BStatusStyle.BOLD &&
+              [BStatusStyle.SLIM, BStatusStyle.BOLD].includes(
+                this.statusStyle
+              ) &&
               horizontalText
             ? 5 / 8
             : null;
@@ -338,7 +339,7 @@ var BatteryDrawIcon = GObject.registerClass(
         cr.translate((w - (verticalBattery ? 0 : bWidthH)) / 2.0, h / 2.0);
         // Rotate text
         if (this.inner === BInner.VTEXT) {
-          cr.rotate(-0.5 * Math.PI);
+          cr.rotate((verticalBattery ? -1 : 1) * 0.5 * Math.PI);
         }
         // Move to (x,y) = (0,0)
         cr.translate(-lr.x - lr.width / 2.0, -lr.y - ir.y - ir.height / 2.0);

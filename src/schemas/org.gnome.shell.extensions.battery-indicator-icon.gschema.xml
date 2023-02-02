@@ -26,6 +26,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
     <key type="d" name="icon-scale">
       <default>1</default>
+      <range min="0.1" max="1000"/>
       <summary>Icon scale as aspect ratio width/height</summary>
     </key>
   </schema>
