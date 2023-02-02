@@ -123,11 +123,26 @@ var BatteryDrawIcon = GObject.registerClass(
         const roundedRect = (x, y, bW, bH, r) => {
           // Battery body: rounded rectangle (x,y,bW,bH)
           const cAngle = 0.5 * Math.PI;
+          const aW = bW < r ? Math.asin((r - bW) / r) : 0;
+          const aH = bH < r ? Math.asin((r - bH) / r) : 0;
+          const rW = Math.min(r, bW - r);
+          const rH = Math.min(r, bH - r);
           cr.newSubPath();
-          cr.arc(x + bW - r, y + r, r, -cAngle, 0);
-          cr.arc(x + bW - r, y + bH - r, r, 0, cAngle);
-          cr.arc(x + r, y + bH - r, r, cAngle, 2 * cAngle);
-          cr.arc(x + r, y + r, r, 2 * cAngle, 3 * cAngle);
+          if (aW === 0 && aH === 0) {
+            // Top right
+            const rr = Math.min(rW, rH);
+            cr.arc(x + bW - rr, y + rr, rr, -cAngle, -aH);
+          }
+          if (aW === 0) {
+            // Bottom right
+            cr.arc(x + bW - rW, y + bH - rW, rW, aH, cAngle);
+          }
+          // Bottom left
+          cr.arc(x + r, y + bH - r, r, cAngle + aW, 2 * cAngle - aH);
+          if (aH === 0) {
+            // Top left
+            cr.arc(x + rH, y + rH, rH, 2 * cAngle + aH, 3 * cAngle - aW);
+          }
           cr.closePath();
         };
         cr.pushGroup();
@@ -210,10 +225,13 @@ var BatteryDrawIcon = GObject.registerClass(
           // Fill inner battery
           Clutter.cairo_set_source_color(cr, fillColor);
           const border = slim ? slimThinkness * 2.5 : strokeWidth / 2 - eps;
+          const innerFillRect = slim
+            ? (...rect) => roundedRect(...rect, border/2)
+            : (...rect) => cr.rectangle(...rect);
           if (verticalBattery) {
             const ih = h - bHeightV - border * 2;
             const [x, y] = [(w - verticalBodyWidth) / 2, bHeightV];
-            cr.rectangle(
+            innerFillRect(
               x + border,
               y + border + ih * (1 - p),
               verticalBodyWidth - border * 2,
@@ -221,7 +239,7 @@ var BatteryDrawIcon = GObject.registerClass(
             );
           } else {
             const iw = w - bWidthH - border * 2;
-            cr.rectangle(
+            innerFillRect(
               border,
               border,
               iw * p,
