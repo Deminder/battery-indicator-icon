@@ -25,3 +25,42 @@ Moreover, the orientation and horizontal scale of the icon may be adjusted:
 <p align="center">
 <img alt="Battery horizontal slim" height="128" src="data/battery_slim_icon.png"/>
 </p>
+
+## Manual Installation
+
+Requires `gnome-shell-extensions` and `gettext`:
+
+```(shell)
+make install
+```
+
+## Development
+
+### Debug
+
+Install on a virtual/remote host for debugging:
+
+```(shell)
+./scripts/install_on_guest.sh $GUEST_SSH_ADDRESS
+```
+
+Install locally with a large debug icon overlay enabled:
+
+```(shell)
+make debug-install
+```
+
+### Update Translations
+
+Extract transalable text from sources to template file `po/main.pot` and update `.po` files:
+
+```(shell)
+./scripts/update-pod.sh
+```
+### References
+
+- https://gjs.guide/extensions/
+- https://gjs.guide/guides/
+- https://gjs-docs.gnome.org/
+- https://github.com/Deminder/osd-volume-number
+- https://github.com/Deminder/ShutdownTimer
