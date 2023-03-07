@@ -89,15 +89,12 @@ var BatteryDrawIcon = GObject.registerClass(
       const strokeWidth = Math.min(4 * one, size / 6.5);
 
       const slim = this.statusStyle === BStatusStyle.SLIM;
-      const fColor = themeNode.get_foreground_color();
-      const bColor = fColor.darken().darken();
+      const iconColors = themeNode.get_icon_colors();
+      const fColor = iconColors.foreground;
+      const bColor = fColor.copy();
+      bColor.alpha *= 0.5;
       const fillColor =
-        this.percentage > 15
-          ? slim
-            ? bColor
-            : fColor
-          : themeNode.get_icon_colors().warning;
-      cr.save();
+        this.percentage > 15 ? (slim ? bColor : fColor) : iconColors.warning;
       const verticalBodyWidth = w * 0.58;
       const horizontalBodyHeight = h;
       const cornerRadius = slim ? strokeWidth : 1.5 * one;
@@ -113,6 +110,9 @@ var BatteryDrawIcon = GObject.registerClass(
         horizontalBodyHeight * buttonLengthFrac,
       ];
       let bgSource = null;
+      let boldEmptyMask = null;
+
+      cr.save();
       // Use background color
       Clutter.cairo_set_source_color(cr, bColor);
       if (
@@ -228,25 +228,35 @@ var BatteryDrawIcon = GObject.registerClass(
           const innerFillRect = slim
             ? (...rect) => roundedRect(...rect, border / 2)
             : (...rect) => cr.rectangle(...rect);
-          if (verticalBattery) {
-            const ih = h - bHeightV - border * 2;
-            const [x, y] = [(w - verticalBodyWidth) / 2, bHeightV];
-            innerFillRect(
-              x + border,
-              y + border + ih * (1 - p),
-              verticalBodyWidth - border * 2,
-              ih * p
-            );
-          } else {
-            const iw = w - bWidthH - border * 2;
-            innerFillRect(
-              border,
-              border,
-              iw * p,
-              horizontalBodyHeight - border * 2
-            );
-          }
+          const drawRect = verticalBattery
+            ? reversed => {
+                const ih = h - bHeightV - border * 2;
+                const [x, y] = [(w - verticalBodyWidth) / 2, bHeightV];
+                innerFillRect(
+                  x + border,
+                  y + border + (reversed ? 0 : ih * (1 - p)),
+                  verticalBodyWidth - border * 2,
+                  ih * (reversed ? 1 - p : p)
+                );
+              }
+            : reversed => {
+                const iw = w - bWidthH - border * 2;
+                innerFillRect(
+                  border + (reversed ? iw * p : 0),
+                  border,
+                  iw * (reversed ? 1 - p : p),
+                  horizontalBodyHeight - border * 2
+                );
+              };
+
+          drawRect();
           cr.fill();
+          if (this.statusStyle === BStatusStyle.BOLD) {
+            cr.pushGroup();
+            drawRect(true);
+            cr.fill();
+            boldEmptyMask = cr.popGroup();
+          }
         } else {
           // Fill battery (plain)
           Clutter.cairo_set_source_color(cr, fillColor);
@@ -263,15 +273,11 @@ var BatteryDrawIcon = GObject.registerClass(
         const [cw, ch] = [w / 2, h / 2];
         // Circle Background
         cr.setLineWidth(strokeWidth);
-        cr.pushGroup();
         cr.translate(cw, ch);
         cr.scale(w / size, h / size);
         cr.arc(0, 0, radius, 0, 2 * Math.PI);
         cr.stroke();
-        bgSource = cr.popGroup();
 
-        cr.translate(cw, ch);
-        cr.scale(w / size, h / size);
         // Circle fill foreground
         Clutter.cairo_set_source_color(cr, fillColor);
         const angleOffset = -0.5 * Math.PI;
@@ -279,10 +285,8 @@ var BatteryDrawIcon = GObject.registerClass(
         cr.stroke();
       }
       cr.restore();
-
-      cr.setOperator(slim ? Cairo.Operator.OVER : Cairo.Operator.DIFFERENCE);
+      cr.pushGroup();
       Clutter.cairo_set_source_color(cr, fColor);
-
       if (this.inner === BInner.CHARGING) {
         // Show charging bolt
         const boltHeight = h * (verticalBattery ? 0.55 : 0.65);
@@ -300,13 +304,6 @@ var BatteryDrawIcon = GObject.registerClass(
         (this.inner === BInner.TEXT || this.inner === BInner.VTEXT)
       ) {
         // Show inner percentage text
-        if (this.statusStyle === BStatusStyle.PLAIN) {
-          cr.setOperator(Cairo.Operator.OVER);
-          Clutter.cairo_set_source_color(
-            cr,
-            themeNode.get_color('-plain-font-color')
-          );
-        }
         const layout = PangoCairo.create_layout(cr);
         layout.set_text(String(this.percentage), -1);
         const desc = themeNode.get_font();
@@ -346,17 +343,25 @@ var BatteryDrawIcon = GObject.registerClass(
 
         PangoCairo.show_layout(cr, layout);
       }
-      if (
-        bgSource !== null &&
-        this.statusStyle !== BStatusStyle.BOLD &&
-        !slim
-      ) {
-        cr.restore();
+      const innerSource = cr.popGroup();
+      if (this.statusStyle === BStatusStyle.PLAIN) {
         cr.setSource(bgSource);
         cr.setOperator(Cairo.Operator.DEST_OVER);
         cr.paint();
       }
+      cr.setSource(innerSource);
+      cr.setOperator(
+        [BStatusStyle.BOLD, BStatusStyle.PLAIN].includes(this.statusStyle)
+          ? Cairo.Operator.DEST_OUT
+          : Cairo.Operator.OVER
+      );
+      cr.paint();
 
+      if (boldEmptyMask !== null) {
+        cr.setOperator(Cairo.Operator.OVER);
+        cr.setSource(innerSource);
+        cr.mask(boldEmptyMask);
+      }
       // Explicitly tell Cairo to free the context memory
       // https://gjs.guide/guides/gjs/memory-management.html#cairo
       cr.$dispose();
