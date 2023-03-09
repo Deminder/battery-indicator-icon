@@ -114,6 +114,7 @@ class Extension {
       'notify::scale-factor',
       update.bind(this)
     );
+    this._themeChangedId = this._theme.connect('changed', update.bind(this));
 
     // Connect settings
     this._dsettingsId = sysIndicator._desktopSettings.connect(
@@ -157,6 +158,8 @@ class Extension {
 
     // Disconnect theme
     this._theme.disconnect(this._themeId);
+    this._theme.disconnect(this._themeChangedId);
+    this._themeChangedId = null;
     this._themeId = null;
     this._theme = null;
 
@@ -181,18 +184,27 @@ class Extension {
   _patch(sysIndicator, powerToggle) {
     if (!('_drawicon' in sysIndicator)) {
       sysIndicator.remove_all_children();
-      sysIndicator._drawicon = new BatteryDrawIcon('battery-indicator');
+      sysIndicator._drawicon = new BatteryDrawIcon({
+        style_class: 'battery-indicator',
+        idolWidget: sysIndicator._indicator,
+      });
       sysIndicator.add_child(sysIndicator._drawicon);
       sysIndicator.add_child(sysIndicator._percentageLabel);
 
-      powerToggle._drawicon = new BatteryDrawIcon('battery-quick-toggle');
+      powerToggle._drawicon = new BatteryDrawIcon({
+        style_class: 'battery-quick-toggle',
+        idolWidget: powerToggle._icon,
+      });
       const b = powerToggle._box;
       b.remove_all_children();
       b.add_child(powerToggle._drawicon);
       b.add_child(powerToggle._label);
 
       if (debugMode) {
-        sysIndicator._drawicondbg = new BatteryDrawIcon('battery-indicator');
+        sysIndicator._drawicondbg = new BatteryDrawIcon({
+          style_class: 'battery-indicator',
+          idolWidget: sysIndicator._indicator,
+        });
         Main.uiGroup.add_actor(sysIndicator._drawicondbg);
       }
     }

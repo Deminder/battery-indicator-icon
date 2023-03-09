@@ -54,19 +54,22 @@ var BatteryDrawIcon = GObject.registerClass(
     },
   },
   class BatteryDrawIcon extends St.DrawingArea {
-    _init(locationClass) {
+    // eslint-disable-next-line camelcase
+    _init({ style_class, idolWidget }) {
       super._init({
         y_align: Clutter.ActorAlign.CENTER,
-        style_class: locationClass,
+        // eslint-disable-next-line camelcase
+        style_class,
       });
+      this.idolWidget = idolWidget;
 
       // https://github.com/LineageOS/android_frameworks_base/blob/-/packages/SettingsLib/src/com/android/settingslib/graph/BatteryMeterDrawableBase.java#L158
       this._bolt_path = Clutter.Path.new_with_description(
         'M 165 0 L 887 0 L 455 368 L 1000 368 L 9 1000 L 355 475 L 0 475 z'
       );
       for (const signal of [
-        'notify::inner',
         'style-changed',
+        'notify::inner',
         'notify::percentage',
         'notify::status-style',
         'notify::vertical',
@@ -77,9 +80,30 @@ var BatteryDrawIcon = GObject.registerClass(
     }
 
     vfunc_repaint() {
+      const themeNode = this.get_theme_node();
+      // Get colors from idol icon (StIcon)
+      const iconColors = this.idolWidget
+        ? St.ThemeNode.new(
+            St.ThemeContext.get_for_stage(global.stage) /* context */,
+            themeNode.get_parent() /* parent_node */,
+            themeNode.get_theme() /* theme */,
+            this.idolWidget.constructor.$gtype /* element_type */,
+            null /* element_id */,
+            this.idolWidget.style_class ?? '' /* style_class */,
+            themeNode.get_pseudo_classes().join(' ') /* pseudo_class */,
+            this.idolWidget.style ?? '' /* inline_style */
+          ).get_icon_colors()
+        : themeNode.get_icon_colors();
+      const slim = this.statusStyle === BStatusStyle.SLIM;
+      const fColor = iconColors.foreground;
+      const bColor = fColor.copy();
+      bColor.alpha *= 0.5;
+      const fillColor =
+        this.percentage > 15 ? (slim ? bColor : fColor) : iconColors.warning;
+
+      // Draw battery icon
       const p = this.percentage / 100;
       const cr = this.get_context();
-      const themeNode = this.get_theme_node();
 
       const [w, h] = this.get_surface_size();
       const verticalBattery =
@@ -88,16 +112,6 @@ var BatteryDrawIcon = GObject.registerClass(
       const one = h / 16;
       const strokeWidth = Math.min(4 * one, size / 6.5);
 
-      const slim = this.statusStyle === BStatusStyle.SLIM;
-      const fColor = themeNode.get_foreground_color();
-      const bColor = fColor.darken().darken();
-      const fillColor =
-        this.percentage > 15
-          ? slim
-            ? bColor
-            : fColor
-          : themeNode.get_icon_colors().warning;
-      cr.save();
       const verticalBodyWidth = w * 0.58;
       const horizontalBodyHeight = h;
       const cornerRadius = slim ? strokeWidth : 1.5 * one;
@@ -113,6 +127,9 @@ var BatteryDrawIcon = GObject.registerClass(
         horizontalBodyHeight * buttonLengthFrac,
       ];
       let bgSource = null;
+      let boldEmptyMask = null;
+
+      cr.save();
       // Use background color
       Clutter.cairo_set_source_color(cr, bColor);
       if (
@@ -208,6 +225,7 @@ var BatteryDrawIcon = GObject.registerClass(
             }
             cr.stroke();
           } else {
+            cr.setOperator(Cairo.Operator.SOURCE);
             // Fill battery button
             if (verticalBattery) {
               cr.rectangle((w - bWidthV) / 2, 0, bWidthV, bHeightV + eps);
@@ -228,25 +246,38 @@ var BatteryDrawIcon = GObject.registerClass(
           const innerFillRect = slim
             ? (...rect) => roundedRect(...rect, border / 2)
             : (...rect) => cr.rectangle(...rect);
-          if (verticalBattery) {
-            const ih = h - bHeightV - border * 2;
-            const [x, y] = [(w - verticalBodyWidth) / 2, bHeightV];
-            innerFillRect(
-              x + border,
-              y + border + ih * (1 - p),
-              verticalBodyWidth - border * 2,
-              ih * p
-            );
-          } else {
-            const iw = w - bWidthH - border * 2;
-            innerFillRect(
-              border,
-              border,
-              iw * p,
-              horizontalBodyHeight - border * 2
-            );
-          }
+          const drawRect = verticalBattery
+            ? reversed => {
+                const ih = h - bHeightV - border * 2;
+                const [x, y] = [(w - verticalBodyWidth) / 2, bHeightV];
+                innerFillRect(
+                  x + border,
+                  y + border + (reversed ? 0 : ih * (1 - p)),
+                  verticalBodyWidth - border * 2,
+                  ih * (reversed ? 1 - p : p)
+                );
+              }
+            : reversed => {
+                const iw = w - bWidthH - border * 2;
+                innerFillRect(
+                  border + (reversed ? iw * p : 0),
+                  border,
+                  iw * (reversed ? 1 - p : p),
+                  horizontalBodyHeight - border * 2
+                );
+              };
+
+          drawRect();
           cr.fill();
+
+          cr.setOperator(Cairo.Operator.OVER);
+          Clutter.cairo_set_source_color(cr, Clutter.Color.get_static('white'));
+          if (this.statusStyle === BStatusStyle.BOLD) {
+            cr.pushGroup();
+            drawRect(true);
+            cr.fill();
+            boldEmptyMask = cr.popGroup();
+          }
         } else {
           // Fill battery (plain)
           Clutter.cairo_set_source_color(cr, fillColor);
@@ -263,15 +294,11 @@ var BatteryDrawIcon = GObject.registerClass(
         const [cw, ch] = [w / 2, h / 2];
         // Circle Background
         cr.setLineWidth(strokeWidth);
-        cr.pushGroup();
         cr.translate(cw, ch);
         cr.scale(w / size, h / size);
         cr.arc(0, 0, radius, 0, 2 * Math.PI);
         cr.stroke();
-        bgSource = cr.popGroup();
 
-        cr.translate(cw, ch);
-        cr.scale(w / size, h / size);
         // Circle fill foreground
         Clutter.cairo_set_source_color(cr, fillColor);
         const angleOffset = -0.5 * Math.PI;
@@ -279,10 +306,8 @@ var BatteryDrawIcon = GObject.registerClass(
         cr.stroke();
       }
       cr.restore();
-
-      cr.setOperator(slim ? Cairo.Operator.OVER : Cairo.Operator.DIFFERENCE);
+      cr.pushGroup();
       Clutter.cairo_set_source_color(cr, fColor);
-
       if (this.inner === BInner.CHARGING) {
         // Show charging bolt
         const boltHeight = h * (verticalBattery ? 0.55 : 0.65);
@@ -300,13 +325,6 @@ var BatteryDrawIcon = GObject.registerClass(
         (this.inner === BInner.TEXT || this.inner === BInner.VTEXT)
       ) {
         // Show inner percentage text
-        if (this.statusStyle === BStatusStyle.PLAIN) {
-          cr.setOperator(Cairo.Operator.OVER);
-          Clutter.cairo_set_source_color(
-            cr,
-            themeNode.get_color('-plain-font-color')
-          );
-        }
         const layout = PangoCairo.create_layout(cr);
         layout.set_text(String(this.percentage), -1);
         const desc = themeNode.get_font();
@@ -346,17 +364,25 @@ var BatteryDrawIcon = GObject.registerClass(
 
         PangoCairo.show_layout(cr, layout);
       }
-      if (
-        bgSource !== null &&
-        this.statusStyle !== BStatusStyle.BOLD &&
-        !slim
-      ) {
-        cr.restore();
+      const innerSource = cr.popGroup();
+      if (this.statusStyle === BStatusStyle.PLAIN) {
         cr.setSource(bgSource);
         cr.setOperator(Cairo.Operator.DEST_OVER);
         cr.paint();
       }
+      cr.setSource(innerSource);
+      cr.setOperator(
+        [BStatusStyle.BOLD, BStatusStyle.PLAIN].includes(this.statusStyle)
+          ? Cairo.Operator.DEST_OUT
+          : Cairo.Operator.OVER
+      );
+      cr.paint();
 
+      if (boldEmptyMask !== null) {
+        cr.setOperator(Cairo.Operator.OVER);
+        cr.setSource(innerSource);
+        cr.mask(boldEmptyMask);
+      }
       // Explicitly tell Cairo to free the context memory
       // https://gjs.guide/guides/gjs/memory-management.html#cairo
       cr.$dispose();
