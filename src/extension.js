@@ -183,27 +183,24 @@ class Extension {
 
   _patch(sysIndicator, powerToggle) {
     if (!('_drawicon' in sysIndicator)) {
-      sysIndicator.remove_all_children();
       sysIndicator._drawicon = new BatteryDrawIcon({
         style_class: 'battery-indicator',
         idolWidget: sysIndicator._indicator,
       });
-      sysIndicator.add_child(sysIndicator._drawicon);
-      sysIndicator.add_child(sysIndicator._percentageLabel);
+      sysIndicator.replace_child(
+        sysIndicator._indicator,
+        sysIndicator._drawicon
+      );
 
       powerToggle._drawicon = new BatteryDrawIcon({
         style_class: 'battery-quick-toggle',
         idolWidget: powerToggle._icon,
       });
-      const b = powerToggle._box;
-      b.remove_all_children();
-      b.add_child(powerToggle._drawicon);
-      b.add_child(powerToggle._label);
+      powerToggle._box.replace_child(powerToggle._icon, powerToggle._drawicon);
 
       if (debugMode) {
         sysIndicator._drawicondbg = new BatteryDrawIcon({
           style_class: 'battery-indicator',
-          idolWidget: sysIndicator._indicator,
         });
         Main.uiGroup.add_actor(sysIndicator._drawicondbg);
       }
@@ -212,18 +209,16 @@ class Extension {
 
   _unpatch(sysIndicator, powerToggle) {
     if ('_drawicon' in sysIndicator) {
+      powerToggle._box.replace_child(powerToggle._drawicon, powerToggle._icon);
       powerToggle._drawicon.destroy();
       delete powerToggle['_drawicon'];
-      const b = powerToggle._box;
-      b.remove_all_children();
-      b.add_child(powerToggle._icon);
-      b.add_child(powerToggle._label);
 
+      sysIndicator.replace_child(
+        sysIndicator._drawicon,
+        sysIndicator._indicator
+      );
       sysIndicator._drawicon.destroy();
       delete sysIndicator['_drawicon'];
-      sysIndicator.remove_all_children();
-      sysIndicator.add_actor(sysIndicator._indicator);
-      sysIndicator.add_child(sysIndicator._percentageLabel);
 
       powerToggle._sync();
       sysIndicator._sync();
