@@ -83,11 +83,36 @@ class Extension {
           ...props,
           // Percentage text is always shown next to powerToggle
           inner: charging ? BInner.CHARGING : BInner.EMPTY,
-          visible: true,
         });
+        let style = '';
+        if (statusStyleStr === 'hidden') {
+          // Text only mode: Style existing percentage labels
+          const colors = sysIndicator._drawicon.iconColors;
+          const rgbaStr = color => {
+            const c = color.to_pixel();
+            const rgba = [
+              (c >> 24) & 0xff,
+              (c >> 16) & 0xff,
+              (c >> 8) & 0xff,
+              (c & 0xff) / 255.0,
+            ].join(',');
+            return `rgba(${rgba})`;
+          };
+          style = charging
+            ? `border-top: solid 3px ${rgbaStr(
+                colors.foreground
+              )}; padding-bottom: 3px; border-radius: 3px;`
+            : percentage > 15
+            ? ''
+            : percentage > 5
+            ? `color: ${rgbaStr(colors.warning)};`
+            : `color: ${rgbaStr(colors.error)};`;
+        }
+        sysIndicator._percentageLabel.set_style(style);
+        powerToggle._title.set_style(style);
 
         if (debugMode) {
-          // Debug: Ensure that text label is updated
+          // Debug: Ensure that text label is updated by the mocked _proxy
           powerToggle._sync();
           // Debug: Show a big debug icon on the primary monitor
           const dbgIcon = sysIndicator._drawicondbg;
@@ -205,6 +230,10 @@ class Extension {
 
   _unpatch(sysIndicator, powerToggle) {
     if ('_drawicon' in sysIndicator) {
+      // Remove color style from percentage label
+      sysIndicator._percentageLabel.set_style('');
+      powerToggle._title.set_style('');
+
       powerToggle._box.replace_child(powerToggle._drawicon, powerToggle._icon);
       powerToggle._drawicon.destroy();
       delete powerToggle['_drawicon'];
