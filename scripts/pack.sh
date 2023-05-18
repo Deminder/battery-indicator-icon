@@ -49,4 +49,5 @@ gnome-extensions pack src \
     --force \
     --podir="../po" \
     --extra-source="drawicon.js" \
+    --extra-source="mock.js" \
     --out-dir="$targetdir"

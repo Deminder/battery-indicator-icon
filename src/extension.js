@@ -35,12 +35,18 @@ class Extension {
 
     const sysIndicator = Main.panel.statusArea.quickSettings._system;
     const { powerToggle } = sysIndicator._systemItem;
+    if (debugMode) {
+      // Debug: Replace the PowerManagerProxy by a mock with cycling values
+      powerToggle._proxy_real = powerToggle._proxy;
+      powerToggle._proxy = new Me.imports.mock.PowerManagerProxyMock();
+    }
+
     const proxy = powerToggle._proxy;
     this._proxy = proxy;
     this._theme = St.ThemeContext.get_for_stage(global.stage);
 
     const update = () => {
-      if (this._proxy.IsPresent || debugMode) {
+      if (this._proxy.IsPresent) {
         this._patch(sysIndicator, powerToggle);
 
         // Update properties of BatteryDrawIcons
@@ -48,11 +54,6 @@ class Extension {
         const width = Math.round(height * settings.get_double('icon-scale'));
         let charging = this._proxy.State === UPower.DeviceState.CHARGING;
         let percentage = this._proxy.Percentage;
-        if (debugMode) {
-          charging = this._debugCounter % 7 === 0;
-          percentage = this._debugCounter % 101;
-          // percentage = (this._debugCounter % 30)/2;
-        }
         const statusStyleStr = settings.get_string('status-style');
 
         const props = {
@@ -86,6 +87,9 @@ class Extension {
         });
 
         if (debugMode) {
+          // Debug: Ensure that text label is updated
+          powerToggle._sync();
+          // Debug: Show a big debug icon on the primary monitor
           const dbgIcon = sysIndicator._drawicondbg;
           dbgIcon.set({
             ...props,
@@ -104,7 +108,7 @@ class Extension {
       }
     };
     // Connect proxy
-    this._proxyId = this._proxy?.connect(
+    this._proxyId = this._proxy.connect(
       'g-properties-changed',
       update.bind(this)
     );
@@ -129,14 +133,6 @@ class Extension {
     ].map(prop => settings.connect(`changed::${prop}`, update.bind(this)));
     this._settings = settings;
 
-    if (debugMode) {
-      // Start debug interval
-      this._debugCounter = 0;
-      this._debugIntervalId = setInterval(() => {
-        this._debugCounter += 1;
-        update();
-      }, 200);
-    }
     update();
   }
 
@@ -153,6 +149,11 @@ class Extension {
 
     // Disconnect proxy
     this._proxy.disconnect(this._proxyId);
+    if ('_proxy_real' in sysIndicator) {
+      sysIndicator._proxy.destroy();
+      sysIndicator._proxy = sysIndicator._proxy_real;
+      delete sysIndicator._proxy_real;
+    }
     this._proxy = null;
     this._proxyId = null;
 
@@ -172,12 +173,6 @@ class Extension {
     this._settingsIds = null;
     this._settings = null;
 
-    if (debugMode && this._debugIntervalId) {
-      // Stop debug interval
-      clearInterval(this._debugIntervalId);
-      this._debugIntervalId = null;
-    }
-
     this._unpatch(sysIndicator, powerToggle);
   }
 
@@ -187,6 +182,7 @@ class Extension {
         style_class: 'battery-indicator',
         idolWidget: sysIndicator._indicator,
       });
+
       sysIndicator.replace_child(
         sysIndicator._indicator,
         sysIndicator._drawicon
