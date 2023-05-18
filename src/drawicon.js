@@ -79,10 +79,10 @@ var BatteryDrawIcon = GObject.registerClass(
       this.queue_repaint();
     }
 
-    vfunc_repaint() {
+    get iconColors() {
       const themeNode = this.get_theme_node();
       // Get colors from idol icon (StIcon)
-      const iconColors = this.idolWidget
+      return this.idolWidget
         ? St.ThemeNode.new(
             St.ThemeContext.get_for_stage(global.stage) /* context */,
             themeNode.get_parent() /* parent_node */,
@@ -94,12 +94,23 @@ var BatteryDrawIcon = GObject.registerClass(
             this.idolWidget.style ?? '' /* inline_style */
           ).get_icon_colors()
         : themeNode.get_icon_colors();
+    }
+
+    vfunc_repaint() {
+      const themeNode = this.get_theme_node();
+      const iconColors = this.iconColors;
       const slim = this.statusStyle === BStatusStyle.SLIM;
       const fColor = iconColors.foreground;
       const bColor = fColor.copy();
       bColor.alpha *= 0.5;
       const fillColor =
-        this.percentage > 15 ? (slim ? bColor : fColor) : iconColors.warning;
+        this.percentage > 15
+          ? slim
+            ? bColor
+            : fColor
+          : this.percentage > 5
+          ? iconColors.warning
+          : iconColors.error;
 
       // Draw battery icon
       const p = this.percentage / 100;
