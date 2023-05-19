@@ -36,7 +36,6 @@ var PowerManagerProxyMock = GObject.registerClass(
         clearInterval(this._debugIntervalId);
         this._debugIntervalId = null;
       }
-      super.destroy();
     }
   }
 );

@@ -149,10 +149,10 @@ class Extension {
 
     // Disconnect proxy
     this._proxy.disconnect(this._proxyId);
-    if ('_proxy_real' in sysIndicator) {
-      sysIndicator._proxy.destroy();
-      sysIndicator._proxy = sysIndicator._proxy_real;
-      delete sysIndicator._proxy_real;
+    if ('_proxy_real' in powerToggle) {
+      powerToggle._proxy.destroy();
+      powerToggle._proxy = powerToggle._proxy_real;
+      delete powerToggle._proxy_real;
     }
     this._proxy = null;
     this._proxyId = null;
