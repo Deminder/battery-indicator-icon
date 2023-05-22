@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-21 15:59+0200\n"
+"POT-Creation-Date: 2023-05-22 15:24+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Philipp Kiemle <philipp.kiemle@gmail.com>\n"
 "Language-Team: \n"
@@ -69,22 +69,26 @@ msgid "Default"
 msgstr "Normal"
 
 #: src/prefs.js:46
+msgid "A little wide"
+msgstr "Etwas breit"
+
+#: src/prefs.js:47
 msgid "Wide"
 msgstr "Breit"
 
-#: src/prefs.js:47
+#: src/prefs.js:48
 msgid "Extra wide"
 msgstr "Extra breit"
 
-#: src/prefs.js:50
+#: src/prefs.js:51
 msgid "Orientation"
 msgstr "Ausrichtung"
 
-#: src/prefs.js:51
+#: src/prefs.js:52
 msgid "Vertical"
 msgstr "Vertikal"
 
-#: src/prefs.js:52
+#: src/prefs.js:53
 msgid "Horizontal"
 msgstr "Horizontal"
 

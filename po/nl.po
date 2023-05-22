@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: battery-indicator-icon v1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-21 15:59+0200\n"
+"POT-Creation-Date: 2023-05-22 15:24+0200\n"
 "PO-Revision-Date: 2023-02-04 20:29+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: Dutch\n"
@@ -74,22 +74,26 @@ msgid "Default"
 msgstr "Standaard"
 
 #: src/prefs.js:46
+msgid "A little wide"
+msgstr ""
+
+#: src/prefs.js:47
 msgid "Wide"
 msgstr "Breed"
 
-#: src/prefs.js:47
+#: src/prefs.js:48
 msgid "Extra wide"
 msgstr "Extra breed"
 
-#: src/prefs.js:50
+#: src/prefs.js:51
 msgid "Orientation"
 msgstr "Oriëntatie"
 
-#: src/prefs.js:51
+#: src/prefs.js:52
 msgid "Vertical"
 msgstr "Verticaal"
 
-#: src/prefs.js:52
+#: src/prefs.js:53
 msgid "Horizontal"
 msgstr "Horizontaal"
 
