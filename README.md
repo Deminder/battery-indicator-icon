@@ -21,9 +21,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
 Addtionally, the battery percentage text may be shown next to or inside the icon.
 The design is inspired by [LineageOS](https://github.com/LineageOS/android_frameworks_base/blob/lineage-20.0/packages/SettingsLib/src/com/android/settingslib/graph).
 
-Moreover, the orientation and horizontal scale of the icon may be adjusted:
+Moreover, the orientation and horizontal scale of the icon may be adjusted.
 <p align="center">
 <img alt="Battery horizontal slim" height="128" src="data/battery_slim_icon.png"/>
+<img alt="Battery horizontal plump" height="128" src="data/battery_plump_icon.png"/>
 </p>
 
 ## Manual Installation
