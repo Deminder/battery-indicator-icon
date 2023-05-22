@@ -13,4 +13,7 @@
 }
 
 .battery-quick-toggle {
+  font-size: 8px;
+  font-weight: bolder;
+  font-family: 'Droid Sans Mono';
 }
