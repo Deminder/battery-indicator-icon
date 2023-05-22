@@ -43,6 +43,7 @@ var BatIconPrefsPage = GObject.registerClass(
 
       this._addComboRow('scale', _('Horizontal scale'), {
         square: _('Default'),
+        film: _('A little wide'),
         golden: _('Wide'),
         double: _('Extra wide'),
       });
@@ -103,13 +104,8 @@ var BatIconPrefsPage = GObject.registerClass(
       const scale = this._settings.get_double('icon-scale');
       this.setComboOption(
         'scale',
-        scale === 1.618
-          ? 'golden'
-          : scale === 2
-          ? 'double'
-          : scale === 1
-          ? 'square'
-          : 'custom',
+        { 1.333: 'film', 1.618: 'golden', 2: 'double', 1: 'square' }[scale] ??
+          'custom',
         showIcon
       );
       delete this.__syncing;
@@ -154,7 +150,7 @@ var BatIconPrefsPage = GObject.registerClass(
       if (scaleOpt !== undefined) {
         this._settings.set_double(
           'icon-scale',
-          scaleOpt === 'golden' ? 1.618 : scaleOpt === 'double' ? 2 : 1
+          { film: 1.333, golden: 1.618, double: 2 }[scaleOpt] ?? 1
         );
       }
     }
