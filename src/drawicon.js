@@ -454,7 +454,7 @@ var BatteryDrawIcon = GObject.registerClass(
         // Outline: Dilate bolt by rotating translations
         const outline = strokeWidth / 8;
         cr.setOperator(Cairo.Operator.DEST_OUT);
-        const angles = 15;
+        const angles = Math.max(6, Math.round((15 * h) / 256));
         for (let a = 0; a < angles; a++) {
           const [x, y] = circXY(outline, (2 * Math.PI * a) / angles);
           cr.translate(x, y);
