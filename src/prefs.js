@@ -41,12 +41,11 @@ var BatIconPrefsPage = GObject.registerClass(
         nextTo: _('Next to the icon'),
       });
 
-      this._addComboRow('scale', _('Horizontal scale'), {
-        square: _('Default'),
-        film: _('A little wide'),
-        golden: _('Wide'),
-        double: _('Extra wide'),
-      });
+      this._addSliderRow(
+        'scale',
+        _('Horizontal scale'),
+        [1.0, 1.333, 1.618, 2.0]
+      );
 
       this._addComboRow('orientation', _('Orientation'), {
         vertical: _('Vertical'),
@@ -101,11 +100,9 @@ var BatIconPrefsPage = GObject.registerClass(
       );
 
       // Horizontal scaling
-      const scale = this._settings.get_double('icon-scale');
-      this.setComboOption(
+      this.setScaleOption(
         'scale',
-        { 1.333: 'film', 1.618: 'golden', 2: 'double', 1: 'square' }[scale] ??
-          'custom',
+        this._settings.get_double('icon-scale'),
         showIcon
       );
       delete this.__syncing;
@@ -120,15 +117,25 @@ var BatIconPrefsPage = GObject.registerClass(
       }
     }
 
+    setScaleOption(prop, value, sensitive) {
+      const [row, adj] = this._rows[prop];
+      adj._valid = value >= adj.lower && value <= adj.upper;
+      if (adj._valid) {
+        adj.value = value;
+      }
+      if (sensitive !== undefined) {
+        row.sensitive = sensitive;
+      }
+    }
+
     _updateSettings() {
       if (this.__syncing) {
         // Skip updating settings during _sync
         return;
       }
-      const [textOpt, styleOpt, scaleOpt, orientOpt] = [
+      const [textOpt, styleOpt, orientOpt] = [
         'text',
         'style',
-        'scale',
         'orientation',
       ].map(prop => {
         const [row, comboOpts] = this._rows[prop];
@@ -147,11 +154,10 @@ var BatIconPrefsPage = GObject.registerClass(
         styleOpt !== 'text' ? styleOpt : 'hidden'
       );
       this._settings.set_string('icon-orientation', orientOpt);
-      if (scaleOpt !== undefined) {
-        this._settings.set_double(
-          'icon-scale',
-          { film: 1.333, golden: 1.618, double: 2 }[scaleOpt] ?? 1
-        );
+
+      const [__, scaleAdj] = this._rows['scale'];
+      if (scaleAdj._valid) {
+        this._settings.set_double('icon-scale', scaleAdj.value);
       }
     }
 
@@ -169,6 +175,38 @@ var BatIconPrefsPage = GObject.registerClass(
       row.connect('notify::selected', this._updateSettings.bind(this));
       this._group.add(row);
     }
+
+    _addSliderRow(prop, title, marks) {
+      const adjustment = new Gtk.Adjustment({
+        lower: 0.75,
+        upper: 2.25,
+        step_increment: 0.001,
+      });
+      const slider = new Gtk.Scale({
+        valign: Gtk.Align.END,
+        orientation: Gtk.Orientation.HORIZONTAL,
+        widthRequest: 350,
+        drawValue: true,
+        valuePos: Gtk.PositionType.TOP,
+        digits: 3,
+        adjustment,
+      });
+      for (const mark of marks) {
+        slider.add_mark(mark, Gtk.PositionType.BOTTOM, mark.toFixed(3));
+      }
+      const row = new Adw.ActionRow({
+        title,
+        activatableWidget: slider,
+      });
+      row.add_suffix(slider);
+      this._rows[prop] = [row, adjustment];
+      adjustment.connect('notify::value', () => {
+        // Support externally configured scale
+        adjustment._valid = true;
+        this._updateSettings();
+      });
+      this._group.add(row);
+    }
   }
 );
 
@@ -176,6 +214,6 @@ function fillPreferencesWindow(window) {
   const page = new BatIconPrefsPage();
 
   window.default_width = 500;
-  window.default_height = 320;
+  window.default_height = 350;
   window.add(page);
 }
