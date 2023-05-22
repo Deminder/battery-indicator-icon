@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: battery-indicator-icon v5\n"
+"Project-Id-Version: battery-indicator-icon v6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-11 10:47+0100\n"
+"POT-Creation-Date: 2023-05-22 14:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,62 +30,66 @@ msgid "Slim"
 msgstr ""
 
 #: src/prefs.js:31
-msgid "Plain"
+msgid "Plump"
 msgstr ""
 
 #: src/prefs.js:32
-msgid "Circle"
+msgid "Plain"
 msgstr ""
 
 #: src/prefs.js:33
+msgid "Circle"
+msgstr ""
+
+#: src/prefs.js:34
 msgid "Text"
 msgstr ""
 
-#: src/prefs.js:36
+#: src/prefs.js:37
 msgid "Battery percentage text"
 msgstr ""
 
-#: src/prefs.js:37
+#: src/prefs.js:38
 msgid "Hidden"
 msgstr ""
 
-#: src/prefs.js:38
+#: src/prefs.js:39
 msgid "Inside the icon"
 msgstr ""
 
-#: src/prefs.js:39
+#: src/prefs.js:40
 msgid "Inside the icon (vertical)"
 msgstr ""
 
-#: src/prefs.js:40
+#: src/prefs.js:41
 msgid "Next to the icon"
 msgstr ""
 
-#: src/prefs.js:43
+#: src/prefs.js:44
 msgid "Horizontal scale"
 msgstr ""
 
-#: src/prefs.js:44
+#: src/prefs.js:45
 msgid "Default"
 msgstr ""
 
-#: src/prefs.js:45
+#: src/prefs.js:46
 msgid "Wide"
 msgstr ""
 
-#: src/prefs.js:46
+#: src/prefs.js:47
 msgid "Extra wide"
 msgstr ""
 
-#: src/prefs.js:49
+#: src/prefs.js:50
 msgid "Orientation"
 msgstr ""
 
-#: src/prefs.js:50
+#: src/prefs.js:51
 msgid "Vertical"
 msgstr ""
 
-#: src/prefs.js:51
+#: src/prefs.js:52
 msgid "Horizontal"
 msgstr ""
 

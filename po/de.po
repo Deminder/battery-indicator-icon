@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-02 13:06+0100\n"
+"POT-Creation-Date: 2023-05-21 15:59+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Philipp Kiemle <philipp.kiemle@gmail.com>\n"
 "Language-Team: \n"
@@ -25,62 +25,66 @@ msgid "Slim"
 msgstr "Schlank"
 
 #: src/prefs.js:31
+msgid "Plump"
+msgstr "Prall"
+
+#: src/prefs.js:32
 msgid "Plain"
 msgstr "Glatt"
 
-#: src/prefs.js:32
+#: src/prefs.js:33
 msgid "Circle"
 msgstr "Kreis"
 
-#: src/prefs.js:33
+#: src/prefs.js:34
 msgid "Text"
 msgstr "Text"
 
-#: src/prefs.js:36
+#: src/prefs.js:37
 msgid "Battery percentage text"
 msgstr "Prozentangabe"
 
-#: src/prefs.js:37
+#: src/prefs.js:38
 msgid "Hidden"
 msgstr "Unsichtbar"
 
-#: src/prefs.js:38
+#: src/prefs.js:39
 msgid "Inside the icon"
 msgstr "Im Symbol"
 
-#: src/prefs.js:39
+#: src/prefs.js:40
 msgid "Inside the icon (vertical)"
 msgstr "Im Symbol (vertikal)"
 
-#: src/prefs.js:40
+#: src/prefs.js:41
 msgid "Next to the icon"
 msgstr "Neben dem Symbol"
 
-#: src/prefs.js:43
+#: src/prefs.js:44
 msgid "Horizontal scale"
 msgstr "Horizontale Skalierung"
 
-#: src/prefs.js:44
+#: src/prefs.js:45
 msgid "Default"
 msgstr "Normal"
 
-#: src/prefs.js:45
+#: src/prefs.js:46
 msgid "Wide"
 msgstr "Breit"
 
-#: src/prefs.js:46
+#: src/prefs.js:47
 msgid "Extra wide"
 msgstr "Extra breit"
 
-#: src/prefs.js:49
+#: src/prefs.js:50
 msgid "Orientation"
 msgstr "Ausrichtung"
 
-#: src/prefs.js:50
+#: src/prefs.js:51
 msgid "Vertical"
 msgstr "Vertikal"
 
-#: src/prefs.js:51
+#: src/prefs.js:52
 msgid "Horizontal"
 msgstr "Horizontal"
 
