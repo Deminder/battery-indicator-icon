@@ -178,21 +178,23 @@ var BatIconPrefsPage = GObject.registerClass(
 
     _addSliderRow(prop, title, marks) {
       const adjustment = new Gtk.Adjustment({
-        lower: 0.75,
-        upper: 2.25,
+        lower: 1.0,
+        upper: 2.0,
         step_increment: 0.001,
       });
       const slider = new Gtk.Scale({
         valign: Gtk.Align.END,
         orientation: Gtk.Orientation.HORIZONTAL,
-        widthRequest: 350,
+        widthRequest: 250,
         drawValue: true,
         valuePos: Gtk.PositionType.TOP,
         digits: 3,
         adjustment,
       });
+      const percentageFmt = v => `${(100 * v).toFixed(0)}%`;
+      slider.set_format_value_func((__, v) => percentageFmt(v));
       for (const mark of marks) {
-        slider.add_mark(mark, Gtk.PositionType.BOTTOM, mark.toFixed(3));
+        slider.add_mark(mark, Gtk.PositionType.BOTTOM, percentageFmt(mark));
       }
       const row = new Adw.ActionRow({
         title,
