@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-22 15:24+0200\n"
+"POT-Creation-Date: 2023-05-22 18:36+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Philipp Kiemle <philipp.kiemle@gmail.com>\n"
 "Language-Team: \n"
@@ -60,35 +60,19 @@ msgstr "Im Symbol (vertikal)"
 msgid "Next to the icon"
 msgstr "Neben dem Symbol"
 
-#: src/prefs.js:44
+#: src/prefs.js:46
 msgid "Horizontal scale"
 msgstr "Horizontale Skalierung"
 
-#: src/prefs.js:45
-msgid "Default"
-msgstr "Normal"
-
-#: src/prefs.js:46
-msgid "A little wide"
-msgstr "Etwas breit"
-
-#: src/prefs.js:47
-msgid "Wide"
-msgstr "Breit"
-
-#: src/prefs.js:48
-msgid "Extra wide"
-msgstr "Extra breit"
-
-#: src/prefs.js:51
+#: src/prefs.js:50
 msgid "Orientation"
 msgstr "Ausrichtung"
 
-#: src/prefs.js:52
+#: src/prefs.js:51
 msgid "Vertical"
 msgstr "Vertikal"
 
-#: src/prefs.js:53
+#: src/prefs.js:52
 msgid "Horizontal"
 msgstr "Horizontal"
 
@@ -110,3 +94,15 @@ msgstr "Ausrichtung des Symbols (vertikal, horizontal)"
 #: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:30
 msgid "Icon scale as aspect ratio width/height"
 msgstr "Symbolgröße als Seitenverhältnis des Icons Breite/Höhe"
+
+#~ msgid "Default"
+#~ msgstr "Normal"
+
+#~ msgid "A little wide"
+#~ msgstr "Etwas breit"
+
+#~ msgid "Wide"
+#~ msgstr "Breit"
+
+#~ msgid "Extra wide"
+#~ msgstr "Extra breit"
