@@ -28,6 +28,7 @@ var BatIconPrefsPage = GObject.registerClass(
       this._addComboRow('style', _('Battery status icon style'), {
         bold: _('Bold'),
         slim: _('Slim'),
+        plump: _('Plump'),
         plain: _('Plain'),
         circle: _('Circle'),
         text: _('Text'),
