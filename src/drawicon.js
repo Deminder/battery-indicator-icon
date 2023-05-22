@@ -174,9 +174,7 @@ var BatteryDrawIcon = GObject.registerClass(
       const [w, h] = this.get_surface_size();
       const buttonRatio = plump ? 0.7 : 0.58;
       const verticalBodyWidth = w * buttonRatio;
-      const horizontalBodyHeight = plump
-        ? Math.min(h, (verticalBodyWidth * 6) / 7)
-        : h;
+      const horizontalBodyHeight = h;
       const verticalBattery = circle || this.vertical;
       const one = h / 16;
       const strokeWidth =
@@ -383,13 +381,10 @@ var BatteryDrawIcon = GObject.registerClass(
 
       if (charging) {
         // Show charging bolt
+        const heightRatio =
+          (verticalBattery ? h - bHeightV : horizontalBodyHeight) / h;
         const boltHeight =
-          h *
-          (plump
-            ? (1.1 * horizontalBodyHeight) / h
-            : verticalBattery
-            ? 0.55
-            : 0.65);
+          h * (plump ? 1.1 * heightRatio : verticalBattery ? 0.55 : 0.65);
         const boltAspect = plump ? 1 : 0.7333;
         const boltWidth = boltHeight * boltAspect;
         const vertBoltAdjust = !plump && verticalBattery ? 0.9 : 1;
@@ -414,7 +409,7 @@ var BatteryDrawIcon = GObject.registerClass(
         layout.set_text(hText || vText ? String(this.percentage) : '!', -1);
         const desc = themeNode.get_font();
         // Adjust font size to fit inside icon
-        const extraHorizontalSpace = w > 1.5 * h;
+        const extraHorizontalSpace = w > (plump ? 1.5 : 1.3) * h;
         const extraVerticalSpace = !verticalBattery && plain;
         const fontSizeFraction =
           (!vText && extraHorizontalSpace) || (vText && extraVerticalSpace)
