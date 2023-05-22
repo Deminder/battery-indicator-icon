@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: battery-indicator-icon v6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-22 14:54+0200\n"
+"POT-Creation-Date: 2023-05-22 15:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -74,22 +74,26 @@ msgid "Default"
 msgstr ""
 
 #: src/prefs.js:46
-msgid "Wide"
+msgid "A little wide"
 msgstr ""
 
 #: src/prefs.js:47
+msgid "Wide"
+msgstr ""
+
+#: src/prefs.js:48
 msgid "Extra wide"
 msgstr ""
 
-#: src/prefs.js:50
+#: src/prefs.js:51
 msgid "Orientation"
 msgstr ""
 
-#: src/prefs.js:51
+#: src/prefs.js:52
 msgid "Vertical"
 msgstr ""
 
-#: src/prefs.js:52
+#: src/prefs.js:53
 msgid "Horizontal"
 msgstr ""
 
