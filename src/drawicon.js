@@ -12,13 +12,8 @@ var BInner = {
   VTEXT: 3,
 };
 
-const CAIRO_LINE_CAP_BUTT = 0;
 const CAIRO_LINE_CAP_ROUND = 1;
-const CAIRO_LINE_CAP_SQUARE = 2;
 
-function roundLineCap(cr) {
-  cr.setLineCap(CAIRO_LINE_CAP_ROUND);
-}
 function circXY(radius, angle) {
   return [radius * Math.cos(angle), radius * Math.sin(angle)];
 }
@@ -31,6 +26,39 @@ var BStatusStyle = {
   CIRCLE: 4,
   HIDE: 5,
 };
+
+function batteryIconPaint(
+  cr,
+  buttonPathFunc,
+  buttonDraw,
+  innerRectPathFunc,
+  rectDraw,
+  style
+) {
+  const drawMethod = method => {
+    if (method === 'fill') {
+      cr.fill();
+    } else if (method === 'stroke') {
+      cr.stroke();
+    }
+  };
+  Clutter.cairo_set_source_color(cr, style.fColor);
+  // Battery button: (fill) rectangle, arc or (stroke) line
+  buttonPathFunc(cr, style);
+  drawMethod(buttonDraw);
+  // Battery body: rounded rectangle (fill plain or stroke outline)
+  bodyPath(cr, style);
+  cr.clipPreserve();
+  cr.setLineWidth(style.strokeWidth);
+  drawMethod(rectDraw);
+
+  // Fill inner battery: (rounded) rectangle
+  Clutter.cairo_set_source_color(cr, style.fillColor);
+  innerRectPathFunc(cr, style);
+  cr.fill();
+
+  cr.resetClip();
+}
 
 function roundedRectPath(cr, x, y, bW, bH, r) {
   // Battery body: rounded rectangle (x,y,bW,bH)
@@ -135,6 +163,133 @@ var BatteryDrawIcon = GObject.registerClass(
         : themeNode.get_icon_colors();
     }
 
+    _bold(cr, style) {
+      const eps = style.strokeWidth * 0.05;
+      const innerRectPath = (_, { strokeWidth }, reversed) => {
+        innerPercentageRectPath(
+          cr,
+          strokeWidth / 2 - eps /* 0-width border */,
+          0 /* cornerRadius */,
+          style,
+          reversed
+        );
+      };
+      batteryIconPaint(
+        cr,
+        () =>
+          rectangleButtonPath(cr, {
+            ...style,
+            bThickness: style.bThickness + eps,
+          }),
+        'fill',
+        innerRectPath,
+        'stroke',
+        style
+      );
+
+      Clutter.cairo_set_source_color(cr, style.fColor);
+      cr.save();
+      cr.setOperator(Cairo.Operator.DEST_OUT);
+      innerContentPath(cr, style);
+      cr.fill();
+      cr.restore();
+
+      cr.setOperator(Cairo.Operator.OVER);
+      innerRectPath(cr, style, true);
+      cr.clip();
+      innerContentPath(cr, style);
+      cr.fill();
+    }
+
+    _slim(cr, style) {
+      const border = style.strokeWidth * 1.25;
+      batteryIconPaint(
+        cr,
+        lineButtonPath,
+        'stroke',
+        () => innerPercentageRectPath(cr, border, border / 2, style),
+        'stroke',
+        style
+      );
+
+      Clutter.cairo_set_source_color(cr, style.fColor);
+      innerContentPath(cr, style);
+      cr.fill();
+    }
+
+    _plump(cr, style) {
+      const border = style.strokeWidth * 0.75;
+      batteryIconPaint(
+        cr,
+        arcButtonPath,
+        'fill',
+        () => innerPercentageRectPath(cr, border, border / 4, style),
+        'stroke',
+        style
+      );
+
+      Clutter.cairo_set_source_color(cr, style.fColor);
+      cr.setOperator(Cairo.Operator.DEST_OUT);
+      cr.setLineCap(CAIRO_LINE_CAP_ROUND);
+      const outlineWidth = plumpInnerContentPath(cr, style);
+      cr.setLineWidth(outlineWidth);
+
+      cr.strokePreserve();
+      cr.setOperator(Cairo.Operator.OVER);
+      cr.fill();
+    }
+
+    _plain(cr, style) {
+      batteryIconPaint(
+        cr,
+        rectangleButtonPath,
+        '',
+        (_, { w, h, p, vertical }) => {
+          if (vertical) {
+            cr.rectangle(0, h * (1 - p), w, h * p);
+          } else {
+            cr.rectangle(0, 0, w * p, h);
+          }
+        },
+        'fill',
+        style
+      );
+
+      Clutter.cairo_set_source_color(cr, Clutter.Color.get_static('white'));
+      cr.setOperator(Cairo.Operator.DEST_OUT);
+      innerContentPath(cr, style);
+      cr.fill();
+    }
+
+    _circle(cr, style) {
+      const { w, h, strokeWidth, fColor, fillColor, p } = style;
+      const size = h;
+      const radius = (size - strokeWidth) / 2;
+      const [cw, ch] = [w / 2, h / 2];
+      const bColor = fColor.copy();
+      bColor.alpha *= 0.5;
+
+      cr.save();
+      Clutter.cairo_set_source_color(cr, bColor);
+      // Circle Background
+      cr.setLineWidth(strokeWidth);
+      cr.translate(cw, ch);
+      cr.scale(w / size, h / size);
+      cr.arc(0, 0, radius, 0, 2 * Math.PI);
+      cr.stroke();
+
+      // Circle fill foreground
+      Clutter.cairo_set_source_color(cr, fillColor);
+      const angleOffset = -0.5 * Math.PI;
+      cr.arc(0, 0, radius, angleOffset, angleOffset + p * 2 * Math.PI);
+      cr.stroke();
+      cr.restore();
+
+      Clutter.cairo_set_source_color(cr, fColor);
+      innerContentPath(cr, style);
+      cr.fill();
+    }
+
     vfunc_repaint() {
       const themeNode = this.get_theme_node();
       const iconColors = this.iconColors;
@@ -168,7 +323,6 @@ var BatteryDrawIcon = GObject.registerClass(
           : iconColors.error;
 
       // Draw battery icon
-      const p = this.percentage / 100;
       const cr = this.get_context();
 
       const [w, h] = this.get_surface_size();
@@ -178,13 +332,7 @@ var BatteryDrawIcon = GObject.registerClass(
       const verticalBattery = circle || this.vertical;
       const one = h / 16;
       const strokeWidth =
-        (plump
-          ? Math.min(1, verticalBodyWidth / h) * 5.333
-          : slim
-          ? 2
-          : verticalBattery
-          ? 2.46
-          : 4) * one;
+        (plump ? 5.333 : slim ? 2 : verticalBattery ? 2.46 : 4) * one;
       const cornerRadius = slim
         ? strokeWidth * 2
         : plump
@@ -197,289 +345,272 @@ var BatteryDrawIcon = GObject.registerClass(
         : slim
         ? strokeWidth
         : strokeWidth * 0.6;
-      const [bWidthV, bHeightV] = [verticalBodyWidth * bFrac, bThickness];
-      const [bWidthH, bHeightH] = [bThickness, horizontalBodyHeight * bFrac];
-      let bgSource = null;
-      let boldEmptyMask = null;
+      const fontDesc = themeNode.get_font();
+      // Adjust font size to fit inside icon
+      const extraHorizontalSpace = w > (plump ? 1.5 : 1.3) * h;
+      const extraVerticalSpace = !verticalBattery && plain;
+      const fontSizeFraction =
+        (!vText && extraHorizontalSpace) || (vText && extraVerticalSpace)
+          ? 9 / 8
+          : (verticalBattery && slim) || (bold && !vText)
+          ? 5 / 8
+          : null;
+      if (fontSizeFraction !== null) {
+        // Note: fontSizeFraction == 1 is not identity
+        fontDesc.set_size(Math.round(fontSizeFraction * fontDesc.get_size()));
+      }
+      const content = charging
+        ? 'bolt'
+        : this.percentage < 100 && (this.percentage <= 5 || hText || vText)
+        ? hText || vText
+          ? String(this.percentage)
+          : '!'
+        : '';
 
-      cr.save();
-      // Use background color
-      Clutter.cairo_set_source_color(cr, bColor);
-      if (bold || slim || plump || plain) {
-        cr.pushGroup();
-        // Battery button: rectangle
-        // Battery body: rounded rectangle
-        if (verticalBattery) {
-          if (plain) {
-            cr.rectangle((w - bWidthV) / 2, 0, bWidthV, bHeightV);
-          }
-          roundedRectPath(
-            cr,
-            (w - verticalBodyWidth) / 2,
-            bHeightV,
-            verticalBodyWidth,
-            h - bHeightV,
-            cornerRadius
-          );
-        } else {
-          if (plain) {
-            cr.rectangle(w - bWidthH, (h - bHeightH) / 2, bWidthH, bHeightH);
-          }
-          roundedRectPath(
-            cr,
-            0,
-            (h - horizontalBodyHeight) / 2,
-            w - bWidthH,
-            horizontalBodyHeight,
-            cornerRadius
-          );
-        }
-        cr.fillPreserve();
-        bgSource = cr.popGroup();
+      const style = {
+        w,
+        h,
+        p: this.percentage / 100,
+        verticalBodyWidth,
+        horizontalBodyHeight,
+        fColor: plain ? bColor : fColor,
+        fillColor,
+        content,
+        vertical: verticalBattery,
+        verticalText: vText,
+        strokeWidth,
+        bFrac,
+        cornerRadius,
+        bThickness,
+        fontDesc,
+        boltPath: plump ? this._plump_bolt_path : this._bolt_path,
+      };
 
-        if (bold || slim || plump) {
-          cr.clipPreserve();
-          // Outline battery
-          Clutter.cairo_set_source_color(cr, fColor);
-          cr.setLineWidth(strokeWidth);
-          cr.stroke();
-
-          cr.restore();
-          // Draw battery button
-          Clutter.cairo_set_source_color(cr, fColor);
-          const eps = one / 4;
-          if (bold) {
-            cr.setOperator(Cairo.Operator.SOURCE);
-            // Fill battery button
-            if (verticalBattery) {
-              cr.rectangle((w - bWidthV) / 2, 0, bWidthV, bHeightV + eps);
-            } else {
-              cr.rectangle(
-                w - bWidthH - eps,
-                (h - bHeightH) / 2,
-                bWidthH + eps,
-                bHeightH
-              );
-            }
-            cr.fill();
-          } else if (slim) {
-            // Draw battery button line
-            // Round line cap
-            const slimThickness = strokeWidth / 2;
-            cr.setLineWidth(slimThickness);
-            roundLineCap(cr);
-            if (verticalBattery) {
-              cr.moveTo((w - bWidthV + slimThickness) / 2, slimThickness / 2);
-              cr.lineTo((w + bWidthV - slimThickness) / 2, slimThickness / 2);
-            } else {
-              cr.moveTo(
-                w - slimThickness / 2,
-                (h - bHeightH + slimThickness) / 2
-              );
-              cr.lineTo(
-                w - slimThickness / 2,
-                (h + bHeightH - slimThickness) / 2
-              );
-            }
-            cr.stroke();
-          } else if (plump) {
-            // Draw battery button arc
-            if (verticalBattery) {
-              const capRadius = bHeightV - strokeWidth / 4;
-              cr.arc(w / 2, capRadius, capRadius, Math.PI, 2 * Math.PI);
-            } else {
-              const capRadius = bWidthH - strokeWidth / 4;
-              cr.arc(
-                w - capRadius,
-                h / 2,
-                capRadius,
-                -Math.PI / 2,
-                Math.PI / 2
-              );
-            }
-            cr.fill();
-          }
-
-          // Fill inner battery
-          Clutter.cairo_set_source_color(cr, fillColor);
-          const border = slim
-            ? strokeWidth * 1.25
-            : plump
-            ? strokeWidth * 0.75
-            : strokeWidth / 2 - eps;
-          const innerFillRect =
-            slim || plump
-              ? (...rect) =>
-                  roundedRectPath(cr, ...rect, plump ? border / 4 : border / 2)
-              : (...rect) => cr.rectangle(...rect);
-          const drawRect = verticalBattery
-            ? reversed => {
-                const ih = h - bHeightV - border * 2;
-                const [x, y] = [(w - verticalBodyWidth) / 2, bHeightV];
-                innerFillRect(
-                  x + border,
-                  y + border + (reversed ? 0 : ih * (1 - p)),
-                  verticalBodyWidth - border * 2,
-                  ih * (reversed ? 1 - p : p)
-                );
-              }
-            : reversed => {
-                const iw = w - bWidthH - border * 2;
-                const y = (h - horizontalBodyHeight) / 2;
-                innerFillRect(
-                  border + (reversed ? iw * p : 0),
-                  y + border,
-                  iw * (reversed ? 1 - p : p),
-                  horizontalBodyHeight - border * 2
-                );
-              };
-
-          drawRect();
-          cr.fill();
-
-          cr.setOperator(Cairo.Operator.OVER);
-          Clutter.cairo_set_source_color(cr, Clutter.Color.get_static('white'));
-          if (bold) {
-            cr.pushGroup();
-            drawRect(true);
-            cr.fill();
-            boldEmptyMask = cr.popGroup();
-          }
-        } else {
-          // Fill battery (plain)
-          Clutter.cairo_set_source_color(cr, fillColor);
-          cr.clip();
-          if (verticalBattery) {
-            cr.rectangle(0, h * (1 - p), w, h * p);
-          } else {
-            cr.rectangle(0, 0, w * p, h);
-          }
-          cr.fill();
-        }
+      if (bold) {
+        this._bold(cr, style);
+      } else if (slim) {
+        this._slim(cr, style);
+      } else if (plump) {
+        this._plump(cr, style);
+      } else if (plain) {
+        this._plain(cr, style);
       } else if (circle) {
-        const size = h;
-        const radius = (size - strokeWidth) / 2;
-        const [cw, ch] = [w / 2, h / 2];
-        // Circle Background
-        cr.setLineWidth(strokeWidth);
-        cr.translate(cw, ch);
-        cr.scale(w / size, h / size);
-        cr.arc(0, 0, radius, 0, 2 * Math.PI);
-        cr.stroke();
-
-        // Circle fill foreground
-        Clutter.cairo_set_source_color(cr, fillColor);
-        const angleOffset = -0.5 * Math.PI;
-        cr.arc(0, 0, radius, angleOffset, angleOffset + p * 2 * Math.PI);
-        cr.stroke();
+        this._circle(cr, style);
       }
-      cr.restore();
-      cr.pushGroup();
-      Clutter.cairo_set_source_color(cr, fColor);
-      const vertButtonAdjust = verticalBattery && plump ? -bHeightV : 0;
-      const horzButtonAdjust = verticalBattery ? 0 : bWidthH;
 
-      if (charging) {
-        // Show charging bolt
-        const heightRatio =
-          (verticalBattery ? h - bHeightV : horizontalBodyHeight) / h;
-        const boltHeight =
-          h * (plump ? 1.1 * heightRatio : verticalBattery ? 0.55 : 0.65);
-        const boltAspect = plump ? 1 : 0.7333;
-        const boltWidth = boltHeight * boltAspect;
-        const vertBoltAdjust = !plump && verticalBattery ? 0.9 : 1;
-        const horzBoltAdjust = plump ? 1 : 0.9;
-        cr.translate(
-          (w - horzButtonAdjust - boltWidth * horzBoltAdjust) / 2.0,
-          (h - vertButtonAdjust - boltHeight * vertBoltAdjust) / 2.0
-        );
-        cr.scale(boltWidth / 1000, boltHeight / 1000);
-        if (plump) {
-          this._plump_bolt_path.to_cairo_path(cr);
-        } else {
-          this._bolt_path.to_cairo_path(cr);
-        }
-        cr.fill();
-      } else if (
-        this.percentage < 100 &&
-        (this.percentage <= 5 || hText || vText)
-      ) {
-        // Show inner percentage text
-        const layout = PangoCairo.create_layout(cr);
-        layout.set_text(hText || vText ? String(this.percentage) : '!', -1);
-        const desc = themeNode.get_font();
-        // Adjust font size to fit inside icon
-        const extraHorizontalSpace = w > (plump ? 1.5 : 1.3) * h;
-        const extraVerticalSpace = !verticalBattery && plain;
-        const fontSizeFraction =
-          (!vText && extraHorizontalSpace) || (vText && extraVerticalSpace)
-            ? 9 / 8
-            : (verticalBattery && slim) || (bold && !vText)
-            ? 5 / 8
-            : null;
-        if (fontSizeFraction !== null) {
-          // Note: fontSizeFraction == 1 is not identity
-          desc.set_size(Math.round(fontSizeFraction * desc.get_size()));
-        }
-        layout.set_font_description(desc);
-        layout.set_alignment(1);
-        PangoCairo.update_layout(cr, layout);
-
-        const textCenter = lo => {
-          const [ir, lr] = lo.get_pixel_extents();
-          return [-lr.x - lr.width / 2.0, -lr.y - ir.y - ir.height / 2.0];
-        };
-        // Move to center
-        cr.translate(
-          (w - horzButtonAdjust) / 2.0,
-          (h - vertButtonAdjust) / 2.0
-        );
-        // Rotate text
-        if (this.inner === BInner.VTEXT) {
-          cr.rotate((verticalBattery ? -1 : 1) * 0.5 * Math.PI);
-        }
-        const [tx, ty] = textCenter(layout);
-        // Move to (x,y) = (0,0)
-        cr.translate(tx, ty);
-
-        PangoCairo.show_layout(cr, layout);
-      }
-      const innerSource = cr.popGroup();
-      if (plain) {
-        cr.setSource(bgSource);
-        cr.setOperator(Cairo.Operator.DEST_OVER);
-        cr.paint();
-      }
-      if (plump) {
-        // Outline: Dilate bolt by rotating translations
-        const outline = strokeWidth / 8;
-        cr.setOperator(Cairo.Operator.DEST_OUT);
-        const angles = Math.max(6, Math.round((15 * h) / 256));
-        for (let a = 0; a < angles; a++) {
-          const [x, y] = circXY(outline, (2 * Math.PI * a) / angles);
-          cr.translate(x, y);
-          cr.setSource(innerSource);
-          cr.paint();
-          cr.translate(-x, -y);
-        }
-      }
-      cr.setSource(innerSource);
-      cr.setOperator(
-        bold || plain ? Cairo.Operator.DEST_OUT : Cairo.Operator.OVER
-      );
-      cr.paint();
-
-      if (boldEmptyMask !== null) {
-        cr.setOperator(Cairo.Operator.OVER);
-        cr.setSource(innerSource);
-        cr.mask(boldEmptyMask);
-      }
       // Explicitly tell Cairo to free the context memory
       // https://gjs.guide/guides/gjs/memory-management.html#cairo
       cr.$dispose();
     }
   }
 );
+
+function plumpInnerContentPath(
+  cr,
+  {
+    w,
+    h,
+    content,
+    strokeWidth,
+    vertical,
+    verticalText,
+    horizontalBodyHeight,
+    bThickness,
+    fontDesc,
+    boltPath,
+  }
+) {
+  const vertButtonAdjust = vertical ? -bThickness : 0;
+  const horzButtonAdjust = vertical ? 0 : bThickness;
+
+  const heightRatio = (vertical ? h - bThickness : horizontalBodyHeight) / h;
+  const boltHeight = h * (1.1 * heightRatio);
+  let outlineScale = 1;
+  if (content === 'bolt') {
+    outlineScale = chargingBoltPath(
+      cr,
+      w,
+      h,
+      boltPath,
+      boltHeight,
+      boltHeight,
+      horzButtonAdjust,
+      vertButtonAdjust,
+      1,
+      1
+    );
+  } else if (content) {
+    innerTextPath(
+      cr,
+      w,
+      h,
+      content,
+      fontDesc,
+      horzButtonAdjust,
+      vertButtonAdjust,
+      verticalText,
+      vertical /* flipped */
+    );
+  }
+  return strokeWidth / (3 * outlineScale);
+}
+
+function innerContentPath(
+  cr,
+  { w, h, content, bThickness, vertical, verticalText, fontDesc, boltPath }
+) {
+  const boltHeight = h * (vertical ? 0.55 : 0.65);
+  const horzButtonAdjust = vertical ? 0 : bThickness;
+  if (content === 'bolt') {
+    chargingBoltPath(
+      cr,
+      w,
+      h,
+      boltPath,
+      boltHeight * 0.7333,
+      boltHeight,
+      horzButtonAdjust,
+      0,
+      0.9,
+      vertical ? 0.9 : 1
+    );
+  } else if (content) {
+    innerTextPath(
+      cr,
+      w,
+      h,
+      content,
+      fontDesc,
+      horzButtonAdjust,
+      0,
+      verticalText,
+      vertical /* flipped */
+    );
+  }
+}
+
+function chargingBoltPath(
+  cr,
+  w,
+  h,
+  boltPath,
+  boltWidth,
+  boltHeight,
+  horzButtonAdjust,
+  vertButtonAdjust,
+  horzBoltAdjust,
+  vertBoltAdjust
+) {
+  cr.translate(
+    (w - horzButtonAdjust - boltWidth * horzBoltAdjust) / 2.0,
+    (h - vertButtonAdjust - boltHeight * vertBoltAdjust) / 2.0
+  );
+  cr.scale(boltWidth / 1000, boltHeight / 1000);
+  boltPath.to_cairo_path(cr);
+  return boltHeight / 1000;
+}
+
+function innerTextPath(
+  cr,
+  w,
+  h,
+  text,
+  fontDesc,
+  horzButtonAdjust,
+  vertButtonAdjust,
+  vertical,
+  flipped
+) {
+  // Show inner percentage text
+  const layout = PangoCairo.create_layout(cr);
+  layout.set_text(text, -1);
+  layout.set_font_description(fontDesc);
+  layout.set_alignment(1);
+  PangoCairo.update_layout(cr, layout);
+
+  const textCenter = lo => {
+    const [ir, lr] = lo.get_pixel_extents();
+    return [-lr.x - lr.width / 2.0, -lr.y - ir.y - ir.height / 2.0];
+  };
+  // Move to center
+  cr.translate((w - horzButtonAdjust) / 2.0, (h - vertButtonAdjust) / 2.0);
+  // Rotate text
+  if (vertical) {
+    cr.rotate((flipped ? -1 : 1) * 0.5 * Math.PI);
+  }
+  const [tx, ty] = textCenter(layout);
+  // Move to (x,y) = (0,0)
+  cr.translate(tx, ty);
+
+  PangoCairo.layout_path(cr, layout);
+}
+function bodyPath(
+  cr,
+  {
+    w,
+    h,
+    verticalBodyWidth,
+    horizontalBodyHeight,
+    cornerRadius,
+    bThickness,
+    vertical,
+  }
+) {
+  if (vertical) {
+    roundedRectPath(
+      cr,
+      (w - verticalBodyWidth) / 2,
+      bThickness,
+      verticalBodyWidth,
+      h - bThickness,
+      cornerRadius
+    );
+  } else {
+    roundedRectPath(
+      cr,
+      0,
+      (h - horizontalBodyHeight) / 2,
+      w - bThickness,
+      horizontalBodyHeight,
+      cornerRadius
+    );
+  }
+}
+
+function innerPercentageRectPath(
+  cr,
+  border,
+  cornerRadius,
+  { w, h, p, verticalBodyWidth, horizontalBodyHeight, bThickness, vertical },
+  reversed = false
+) {
+  const innerFillRect = cornerRadius
+    ? (...rect) => roundedRectPath(cr, ...rect, cornerRadius)
+    : (...rect) => cr.rectangle(...rect);
+  if (vertical) {
+    const ih = h - bThickness - border * 2;
+    const [x, y] = [(w - verticalBodyWidth) / 2, bThickness];
+    innerFillRect(
+      x + border,
+      y + border + (reversed ? 0 : ih * (1 - p)),
+      verticalBodyWidth - border * 2,
+      ih * (reversed ? 1 - p : p)
+    );
+  } else {
+    const iw = w - bThickness - border * 2;
+    const y = (h - horizontalBodyHeight) / 2;
+    innerFillRect(
+      border + (reversed ? iw * p : 0),
+      y + border,
+      iw * (reversed ? 1 - p : p),
+      horizontalBodyHeight - border * 2
+    );
+  }
+}
+
+/*
+  BATTERY CHARGING BOLTS
+*/
 
 function plumpBoltPath(size = 1000, diagonalAngle = (Math.PI * 70) / 180) {
   const neg = ([x, y]) => [-x, -y];
@@ -545,4 +676,62 @@ function plumpBoltPath(size = 1000, diagonalAngle = (Math.PI * 70) / 180) {
   );
   p.add_close();
   return p;
+}
+
+/*
+  BATTERY BUTTONS
+*/
+
+function rectangleButtonPath(
+  cr,
+  { w, h, horizontalBodyHeight, verticalBodyWidth, bFrac, bThickness, vertical }
+) {
+  const [bWidthV, bHeightH] = [
+    verticalBodyWidth * bFrac,
+    horizontalBodyHeight * bFrac,
+  ];
+  if (vertical) {
+    cr.rectangle((w - bWidthV) / 2, 0, bWidthV, bThickness);
+  } else {
+    cr.rectangle(w - bThickness, (h - bHeightH) / 2, bThickness, bHeightH);
+  }
+}
+
+function lineButtonPath(
+  cr,
+  {
+    w,
+    h,
+    horizontalBodyHeight,
+    verticalBodyWidth,
+    strokeWidth,
+    bFrac,
+    vertical,
+  }
+) {
+  const [bWidthV, bHeightH] = [
+    verticalBodyWidth * bFrac,
+    horizontalBodyHeight * bFrac,
+  ];
+  const slimThickness = strokeWidth / 2;
+  cr.setLineWidth(slimThickness);
+  cr.setLineCap(CAIRO_LINE_CAP_ROUND);
+  if (vertical) {
+    cr.moveTo((w - bWidthV + slimThickness) / 2, slimThickness / 2);
+    cr.lineTo((w + bWidthV - slimThickness) / 2, slimThickness / 2);
+  } else {
+    cr.moveTo(w - slimThickness / 2, (h - bHeightH + slimThickness) / 2);
+    cr.lineTo(w - slimThickness / 2, (h + bHeightH - slimThickness) / 2);
+  }
+}
+
+function arcButtonPath(cr, { w, h, strokeWidth, bThickness, vertical }) {
+  // Draw battery button arc
+  if (vertical) {
+    const capRadius = bThickness - strokeWidth / 4;
+    cr.arc(w / 2, capRadius, capRadius, Math.PI, 2 * Math.PI);
+  } else {
+    const capRadius = bThickness - strokeWidth / 4;
+    cr.arc(w - capRadius, h / 2, capRadius, -Math.PI / 2, Math.PI / 2);
+  }
 }
