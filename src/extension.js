@@ -1,44 +1,58 @@
 // SPDX-FileCopyrightText: 2023 Deminder <tremminder@gmail.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-const { St, UPowerGlib: UPower } = imports.gi;
-const Main = imports.ui.main;
-const Panel = imports.ui.panel;
+import St from 'gi://St';
+import UPowerGlib from 'gi://UPowerGlib';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const { BatteryDrawIcon, BInner, BStatusStyle } = Me.imports.drawicon;
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
+import { InjectionTracker } from './modules/sdt/injection.js';
 
-let debugMode = false;
+import { BatteryDrawIcon, BInner, BStatusStyle } from './modules/drawicon.js';
+import { PowerManagerProxyMock } from './modules/mock.js';
+import { debugMode } from './modules/util.js';
 
-class Extension {
-  constructor() {
-    ExtensionUtils.initTranslations();
-    this._proxy = null;
-  }
+export default class BatteryIndicatorIcon extends Extension {
+  tracker = new InjectionTracker();
+  setupDone = false;
 
   enable() {
-    if (this._proxy !== null) {
-      // Extension already enabled
-      return;
-    }
-    const settings = ExtensionUtils.getSettings();
+    this._settings = this.getSettings();
+
     // Port legacy setting names
     const legacyProps = {
       portrait: 'bold',
       plainportrait: 'plain',
     };
-    const stylePropName = settings.get_string('status-style');
+    const stylePropName = this._settings.get_string('status-style');
     if (stylePropName in legacyProps) {
-      settings.set_string('status-style', legacyProps[stylePropName]);
+      this._settings.set_string('status-style', legacyProps[stylePropName]);
     }
 
-    const sysIndicator = Main.panel.statusArea.quickSettings._system;
+    const qs = Main.panel.statusArea.quickSettings;
+    if ('_system' in qs) {
+      this._setup(qs);
+    } else {
+      const injection = this.tracker.injectProperty(
+        qs,
+        '_addItems' in qs ? '_addItems' : '_addItemsBefore',
+        (...args) => {
+          this._setup(qs);
+          injection.clear();
+          injection.previous.call(qs, ...args);
+        }
+      );
+    }
+  }
+
+  _setup(qs) {
+    const settings = this._settings;
+    const sysIndicator = qs._system;
     const { powerToggle } = sysIndicator._systemItem;
     if (debugMode) {
       // Debug: Replace the PowerManagerProxy by a mock with cycling values
       powerToggle._proxy_real = powerToggle._proxy;
-      powerToggle._proxy = new Me.imports.mock.PowerManagerProxyMock();
+      powerToggle._proxy = new PowerManagerProxyMock();
     }
 
     const proxy = powerToggle._proxy;
@@ -50,9 +64,9 @@ class Extension {
         this._patch(sysIndicator, powerToggle);
 
         // Update properties of BatteryDrawIcons
-        const height = this._theme.scaleFactor * Panel.PANEL_ICON_SIZE;
+        const height = this._theme.scaleFactor * 16; // panel.js::PANEL_ICON_SIZE === 16
         const width = Math.round(height * settings.get_double('icon-scale'));
-        let charging = this._proxy.State === UPower.DeviceState.CHARGING;
+        let charging = this._proxy.State === UPowerGlib.DeviceState.CHARGING;
         let percentage = this._proxy.Percentage;
         const statusStyleStr = settings.get_string('status-style');
 
@@ -158,19 +172,20 @@ class Extension {
       'icon-scale',
       'icon-orientation',
     ].map(prop => settings.connect(`changed::${prop}`, update.bind(this)));
-    this._settings = settings;
 
     update();
+    this.setupDone = true;
   }
 
   disable() {
     // Unlock-dialog session-mode required:
     // since the battery indicator is also visible in the unlock-dialog.
     // The user most likely expects the custom icon to appear in the unlock-dialog.
-    if (this._proxy === null) {
-      // Extension already disabled
+    this.tracker.clearAll();
+    if (!this.setupDone) {
       return;
     }
+    this.setupDone = false;
     const sysIndicator = Main.panel.statusArea.quickSettings._system;
     const { powerToggle } = sysIndicator._systemItem;
 
@@ -257,8 +272,4 @@ class Extension {
       }
     }
   }
-}
-
-function init() {
-  return new Extension();
 }

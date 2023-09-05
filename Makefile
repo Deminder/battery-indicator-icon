@@ -2,44 +2,29 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-UUID := $(shell grep uuid src/metadata.json | cut -d\" -f 4)
-ZIP_FILE := $(UUID).shell-extension.zip
-$(info Version: $(shell grep -oP '^ *?\"version\": *?\K(\d+)' src/metadata.json) ($(ZIP_FILE)))
+ifeq ($(wildcard sdt/build),)
+$(info Not initialized! Try running:)
+$(info > git submodule update --init --remote --recursive --checkout sdt)
+$(info )
+$(info )
+endif
 
-GETTEXTDOMAIN := $(shell grep gettext-domain src/metadata.json | cut -d\" -f 4)
+include sdt/build/default.mk
 
-SOURCE_FILES := $(shell find src -type f)
+SDT_MODULES := util injection
+SDT_DIR := $(SRC_DIR)/modules/sdt
+SDT_FILES := $(patsubst %,$(SDT_DIR)/%.js,$(SDT_MODULES))
 
-target-zip=$(patsubst %,target/%/$(ZIP_FILE),$(1))
-DEFAULT_ZIP := $(call target-zip,default)
-DEBUG_ZIP := $(call target-zip,debug)
+SOURCE_FILES += $(SDT_FILES)
+DEBUGMODE_MODULE := $(SDT_DIR)/util.js
 
-all: $(DEFAULT_ZIP) $(DEBUG_ZIP)
-
-$(DEFAULT_ZIP) $(DEBUG_ZIP): $(OUTPUTS) $(SOURCE_FILES)
+$(SDT_FILES): $(SDT_DIR)/%.js: sdt/src/modules/%.js
 	@mkdir -p $(@D)
-	@./scripts/pack.sh $(shell [ $(@D) = target/debug ] && echo "-d") -t $(@D)
+	@cp $< $@
 
-zip: $(DEFAULT_ZIP)
-debug-zip: $(DEBUG_ZIP)
+include sdt/build/gnome-extension.mk
 
-lint:
-	npm run lint
-	npm run prettier
+distclean: clean
+	-rm -r $(SDT_DIR)
 
-define INSTALL_EXTENSION
-.PHONY: $(1)
-$(1): $(2)
-	@echo "Install extension$(3)..."
-	@gnome-extensions install --force $(2) && \
-		echo "Extension is installed$(3). Now restart the GNOME Shell." || (echo "ERROR: Could not install the extension!" && exit 1)
-endef
-
-$(eval $(call INSTALL_EXTENSION,install,$(DEFAULT_ZIP),))
-$(eval $(call INSTALL_EXTENSION,debug-install,$(DEBUG_ZIP), with debug enabled))
-
-clean:
-	-rm -rf target
-	-rm -f $(OUTPUTS)
-
-.PHONY: clean lint zip debug-zip
+.PHONY: distclean test

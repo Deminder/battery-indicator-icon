@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: 2023 Deminder <tremminder@gmail.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-const { GObject, UPowerGlib: UPower } = imports.gi;
+import GObject from 'gi://GObject';
+import UPowerGlib from 'gi://UPowerGlib';
 
-var PowerManagerProxyMock = GObject.registerClass(
+export const PowerManagerProxyMock = GObject.registerClass(
   {
     Signals: {
       'g-properties-changed': {},
@@ -15,7 +16,7 @@ var PowerManagerProxyMock = GObject.registerClass(
       this._debugCounter = 0;
       // Start debug interval
       this._debugCounter = 0;
-      this.State = UPower.DeviceState.UNKNOWN;
+      this.State = UPowerGlib.DeviceState.UNKNOWN;
       this.Percentage = 0;
       this.IsPresent = true;
       this.IconName = 'battery-level-100-charged-symbolic';
@@ -23,8 +24,8 @@ var PowerManagerProxyMock = GObject.registerClass(
         this._debugCounter += 1;
         this.State =
           this._debugCounter % 7 <= 1
-            ? UPower.DeviceState.CHARGING
-            : UPower.DeviceState.DISCHARGING;
+            ? UPowerGlib.DeviceState.CHARGING
+            : UPowerGlib.DeviceState.DISCHARGING;
         this.Percentage = this._debugCounter % 101;
         this.emit('g-properties-changed');
       }, 200);

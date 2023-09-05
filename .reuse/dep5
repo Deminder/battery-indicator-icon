@@ -11,6 +11,6 @@ Files: data/*.png
 Copyright: 2023 Deminder <tremminder@gmail.com>
 License: CC-BY-SA-4.0
 
-Files: .github/**
+Files: .gitmodules .github/**
 Copyright: 2023 Deminder <tremminder@gmail.com>
 License: MIT

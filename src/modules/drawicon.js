@@ -1,11 +1,13 @@
 // SPDX-FileCopyrightText: 2023 Deminder <tremminder@gmail.com>
-//
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-const { GObject, St, Clutter, PangoCairo } = imports.gi;
-const Cairo = imports.cairo;
+import GObject from 'gi://GObject';
+import St from 'gi://St';
+import Clutter from 'gi://Clutter';
+import PangoCairo from 'gi://PangoCairo';
+import Cairo from 'cairo';
 
-var BInner = {
+export const BInner = {
   EMPTY: 0,
   CHARGING: 1,
   TEXT: 2,
@@ -18,7 +20,7 @@ function circXY(radius, angle) {
   return [radius * Math.cos(angle), radius * Math.sin(angle)];
 }
 
-var BStatusStyle = {
+export const BStatusStyle = {
   BOLD: 0,
   SLIM: 1,
   PLUMP: 2,
@@ -86,7 +88,7 @@ function roundedRectPath(cr, x, y, bW, bH, r) {
   cr.closePath();
 }
 
-var BatteryDrawIcon = GObject.registerClass(
+export const BatteryDrawIcon = GObject.registerClass(
   {
     Properties: {
       inner: GObject.ParamSpec.int(
@@ -506,7 +508,23 @@ function chargingBoltPath(
     (h - vertButtonAdjust - boltHeight * vertBoltAdjust) / 2.0
   );
   cr.scale(boltWidth / 1000, boltHeight / 1000);
-  boltPath.to_cairo_path(cr);
+
+  if ('to_cairo_path' in boltPath) {
+    boltPath.to_cairo_path(cr);
+  } else {
+    const drawPathNode = {
+      [Clutter.PathNodeType.CLOSE]: () => cr.closePath(),
+      [Clutter.PathNodeType.CURVE_TO]: points =>
+        cr.curveTo(...points.slice(0, 6)),
+      [Clutter.PathNodeType.LINE_TO]: points =>
+        cr.lineTo(...points.slice(0, 2)),
+      [Clutter.PathNodeType.MOVE_TO]: points =>
+        cr.moveTo(...points.slice(0, 2)),
+    };
+    boltPath.foreach(node =>
+      drawPathNode[node.type](node.points.flatMap(p => [p.x, p.y]))
+    );
+  }
   return boltHeight / 1000;
 }
 

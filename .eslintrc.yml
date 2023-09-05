@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 extends:
-  - ./lint/eslintrc-gjs.yml
-  - ./lint/eslintrc-shell.yml
-  - ./lint/eslintrc-extension.yml
+  - ./sdt/lint/eslintrc-gjs.yml
+  - ./sdt/lint/eslintrc-shell.yml
+  - ./sdt/lint/eslintrc-extension.yml
   - prettier

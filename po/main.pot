@@ -1,14 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the battery-indicator-icon package.
+# Copyright (C) YEAR Battery Indicator Icon
+# This file is distributed under the same license as the Battery Indicator Icon package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: battery-indicator-icon v7\n"
+"Project-Id-Version: Battery Indicator Icon 8\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-26 19:56+0200\n"
+"POT-Creation-Date: 2023-09-10 12:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,70 +16,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: src/prefs.js:28
-msgid "Battery status icon style"
-msgstr ""
-
-#: src/prefs.js:29
-msgid "Bold"
-msgstr ""
-
-#: src/prefs.js:30
-msgid "Slim"
-msgstr ""
-
-#: src/prefs.js:31
-msgid "Plump"
-msgstr ""
-
-#: src/prefs.js:32
-msgid "Plain"
-msgstr ""
-
-#: src/prefs.js:33
-msgid "Circle"
-msgstr ""
-
-#: src/prefs.js:34
-msgid "Text"
-msgstr ""
-
-#: src/prefs.js:37
-msgid "Battery percentage text"
-msgstr ""
-
-#: src/prefs.js:38
-msgid "Hidden"
-msgstr ""
-
-#: src/prefs.js:39
-msgid "Inside the icon"
-msgstr ""
-
-#: src/prefs.js:40
-msgid "Inside the icon (vertical)"
-msgstr ""
-
-#: src/prefs.js:41
-msgid "Next to the icon"
-msgstr ""
-
-#: src/prefs.js:46
-msgid "Horizontal scale"
-msgstr ""
-
-#: src/prefs.js:50
-msgid "Orientation"
-msgstr ""
-
-#: src/prefs.js:51
-msgid "Vertical"
-msgstr ""
-
-#: src/prefs.js:52
-msgid "Horizontal"
-msgstr ""
 
 #: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14
 msgid "Battery status icon style (bold, slim, plain, circle, hidden)"
@@ -96,4 +32,68 @@ msgstr ""
 
 #: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:30
 msgid "Icon scale as aspect ratio width/height"
+msgstr ""
+
+#: src/prefs.js:27
+msgid "Battery status icon style"
+msgstr ""
+
+#: src/prefs.js:28
+msgid "Bold"
+msgstr ""
+
+#: src/prefs.js:29
+msgid "Slim"
+msgstr ""
+
+#: src/prefs.js:30
+msgid "Plump"
+msgstr ""
+
+#: src/prefs.js:31
+msgid "Plain"
+msgstr ""
+
+#: src/prefs.js:32
+msgid "Circle"
+msgstr ""
+
+#: src/prefs.js:33
+msgid "Text"
+msgstr ""
+
+#: src/prefs.js:36
+msgid "Battery percentage text"
+msgstr ""
+
+#: src/prefs.js:37
+msgid "Hidden"
+msgstr ""
+
+#: src/prefs.js:38
+msgid "Inside the icon"
+msgstr ""
+
+#: src/prefs.js:39
+msgid "Inside the icon (vertical)"
+msgstr ""
+
+#: src/prefs.js:40
+msgid "Next to the icon"
+msgstr ""
+
+#: src/prefs.js:45
+msgid "Horizontal scale"
+msgstr ""
+
+#: src/prefs.js:49
+msgid "Orientation"
+msgstr ""
+
+#: src/prefs.js:50
+msgid "Vertical"
+msgstr ""
+
+#: src/prefs.js:51
+msgid "Horizontal"
 msgstr ""
