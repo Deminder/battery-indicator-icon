@@ -1,23 +1,22 @@
 // SPDX-FileCopyrightText: 2023 Deminder <tremminder@gmail.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-const { Adw, Gio, Gtk, GObject } = imports.gi;
+import Adw from 'gi://Adw';
+import Gio from 'gi://Gio';
+import Gtk from 'gi://Gtk';
+import GObject from 'gi://GObject';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Gettext = imports.gettext.domain('battery-indicator-icon');
-const _ = Gettext.gettext;
+import {
+  ExtensionPreferences,
+  gettext as _,
+} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-function init() {
-  ExtensionUtils.initTranslations();
-}
-
-var BatIconPrefsPage = GObject.registerClass(
+const BatIconPrefsPage = GObject.registerClass(
   class BatIconPrefsPage extends Adw.PreferencesPage {
-    _init() {
-      super._init();
+    constructor({ settings, ...props }) {
+      super(props);
 
-      this._settings = ExtensionUtils.getSettings();
+      this._settings = settings;
       this._dsettings = new Gio.Settings({
         schema_id: 'org.gnome.desktop.interface',
       });
@@ -212,10 +211,20 @@ var BatIconPrefsPage = GObject.registerClass(
   }
 );
 
-function fillPreferencesWindow(window) {
-  const page = new BatIconPrefsPage();
+export default class ShutdownTimerPreferences extends ExtensionPreferences {
+  /**
+   * Fill the preferences window with preferences.
+   *
+   * The default implementation adds the widget
+   * returned by getPreferencesWidget().
+   *
+   * @param {Adw.PreferencesWindow} window - the preferences window
+   */
+  fillPreferencesWindow(window) {
+    const page = new BatIconPrefsPage({ settings: this.getSettings() });
 
-  window.default_width = 500;
-  window.default_height = 350;
-  window.add(page);
+    window.default_width = 500;
+    window.default_height = 350;
+    window.add(page);
+  }
 }

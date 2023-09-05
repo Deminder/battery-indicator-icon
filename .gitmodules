@@ -1,0 +1,3 @@
+[submodule "sdt"]
+	path = sdt
+	url = https://github.com/Deminder/ShutdownTimer.git

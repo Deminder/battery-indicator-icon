@@ -1,12 +1,14 @@
 # SPDX-FileCopyrightText: 2023 Deminder <tremminder@gmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-/src/locale
-/src/schemas/gschemas.compiled
+*.compiled
 target/
 *.env
 *~
 *.mo
+debug-guest.sh
 
 node_modules
 package-lock.json
+
+src/modules/sdt
