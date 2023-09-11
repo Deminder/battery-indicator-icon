@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: battery-indicator-icon v1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-10 12:11+0200\n"
+"POT-Creation-Date: 2023-09-11 19:29+0200\n"
 "PO-Revision-Date: 2023-05-26 11:41+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: Dutch\n"
@@ -16,25 +16,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.3.1\n"
-
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14
-msgid "Battery status icon style (bold, slim, plain, circle, hidden)"
-msgstr "Accustatuspictogramstijl (bold, slim, plain, circle, hidden)"
-
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:19
-msgid ""
-"Show battery percentage text in icon (hidden: 0, horizontal: 1, vertical: 2)"
-msgstr ""
-"Accupercentagetekst op pictogram tonen (verborgen: 0 - horizontaal: 1 - "
-"verticaal: 2)"
-
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:24
-msgid "Icon orientation (vertical, horizontal)"
-msgstr "Pictogramoriëntatie (verticaal, horizontaal)"
-
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:30
-msgid "Icon scale as aspect ratio width/height"
-msgstr "Pictogramgrootte op basis van beeldverhouding"
 
 #: src/prefs.js:27
 msgid "Battery status icon style"
@@ -99,6 +80,25 @@ msgstr "Verticaal"
 #: src/prefs.js:51
 msgid "Horizontal"
 msgstr "Horizontaal"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14
+msgid "Battery status icon style (bold, slim, plain, circle, hidden)"
+msgstr "Accustatuspictogramstijl (bold, slim, plain, circle, hidden)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:19
+msgid ""
+"Show battery percentage text in icon (hidden: 0, horizontal: 1, vertical: 2)"
+msgstr ""
+"Accupercentagetekst op pictogram tonen (verborgen: 0 - horizontaal: 1 - "
+"verticaal: 2)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:24
+msgid "Icon orientation (vertical, horizontal)"
+msgstr "Pictogramoriëntatie (verticaal, horizontaal)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:30
+msgid "Icon scale as aspect ratio width/height"
+msgstr "Pictogramgrootte op basis van beeldverhouding"
 
 #~ msgid "Default"
 #~ msgstr "Standaard"

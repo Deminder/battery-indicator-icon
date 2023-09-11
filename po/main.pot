@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Battery Indicator Icon 8\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-10 12:11+0200\n"
+"POT-Creation-Date: 2023-09-11 19:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,23 +16,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14
-msgid "Battery status icon style (bold, slim, plain, circle, hidden)"
-msgstr ""
-
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:19
-msgid ""
-"Show battery percentage text in icon (hidden: 0, horizontal: 1, vertical: 2)"
-msgstr ""
-
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:24
-msgid "Icon orientation (vertical, horizontal)"
-msgstr ""
-
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:30
-msgid "Icon scale as aspect ratio width/height"
-msgstr ""
 
 #: src/prefs.js:27
 msgid "Battery status icon style"
@@ -96,4 +79,21 @@ msgstr ""
 
 #: src/prefs.js:51
 msgid "Horizontal"
+msgstr ""
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14
+msgid "Battery status icon style (bold, slim, plain, circle, hidden)"
+msgstr ""
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:19
+msgid ""
+"Show battery percentage text in icon (hidden: 0, horizontal: 1, vertical: 2)"
+msgstr ""
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:24
+msgid "Icon orientation (vertical, horizontal)"
+msgstr ""
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:30
+msgid "Icon scale as aspect ratio width/height"
 msgstr ""

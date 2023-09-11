@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: battery-indicator-icon v2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-10 12:11+0200\n"
+"POT-Creation-Date: 2023-09-11 19:29+0200\n"
 "PO-Revision-Date: 2023-02-04 14:13+0100\n"
 "Last-Translator: Albano Battistella <albano_battistella@hotmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
@@ -15,27 +15,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14
-msgid "Battery status icon style (bold, slim, plain, circle, hidden)"
-msgstr ""
-"Stile dell'icona di stato della batteria (grassetto, sottile, normale, "
-"circolare, nascosta)"
-
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:19
-msgid ""
-"Show battery percentage text in icon (hidden: 0, horizontal: 1, vertical: 2)"
-msgstr ""
-"Mostra testo percentuale batteria nell'icona (nascosto: 0, orizzontale: 1, "
-"verticale: 2)"
-
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:24
-msgid "Icon orientation (vertical, horizontal)"
-msgstr "Orientamento delle icone (verticale, orizzontale)"
-
-#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:30
-msgid "Icon scale as aspect ratio width/height"
-msgstr "Scala dell'icona come rapporto larghezza/altezza"
 
 #: src/prefs.js:27
 msgid "Battery status icon style"
@@ -100,6 +79,27 @@ msgstr "Verticale"
 #: src/prefs.js:51
 msgid "Horizontal"
 msgstr "Orrizontale"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14
+msgid "Battery status icon style (bold, slim, plain, circle, hidden)"
+msgstr ""
+"Stile dell'icona di stato della batteria (grassetto, sottile, normale, "
+"circolare, nascosta)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:19
+msgid ""
+"Show battery percentage text in icon (hidden: 0, horizontal: 1, vertical: 2)"
+msgstr ""
+"Mostra testo percentuale batteria nell'icona (nascosto: 0, orizzontale: 1, "
+"verticale: 2)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:24
+msgid "Icon orientation (vertical, horizontal)"
+msgstr "Orientamento delle icone (verticale, orizzontale)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:30
+msgid "Icon scale as aspect ratio width/height"
+msgstr "Scala dell'icona come rapporto larghezza/altezza"
 
 #~ msgid "Default"
 #~ msgstr "Predefinito"
