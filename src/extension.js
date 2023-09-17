@@ -13,10 +13,10 @@ import { PowerManagerProxyMock } from './modules/mock.js';
 import { debugMode } from './modules/util.js';
 
 export default class BatteryIndicatorIcon extends Extension {
-  tracker = new InjectionTracker();
   setupDone = false;
 
   enable() {
+    this.tracker = new InjectionTracker();
     this._settings = this.getSettings();
 
     // Port legacy setting names
@@ -182,6 +182,7 @@ export default class BatteryIndicatorIcon extends Extension {
     // since the battery indicator is also visible in the unlock-dialog.
     // The user most likely expects the custom icon to appear in the unlock-dialog.
     this.tracker.clearAll();
+    this.tracker = null;
     if (!this.setupDone) {
       return;
     }
