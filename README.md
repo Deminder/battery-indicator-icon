@@ -33,7 +33,7 @@ Requires `gnome-shell-extensions` and `gettext`:
 ```(shell)
 make install
 ```
-The last supported version will be checkout automatically.
+Before install it will switch the last supported version.
 ## Development
 
 ### Debug
