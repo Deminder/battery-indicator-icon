@@ -1,0 +1,93 @@
+# INDONESIA TRANSLATION.
+# Copyright (C) YEAR Battery Indicator Icon
+# This file is distributed under the same license as the Battery Indicator Icon package.
+# ILham Adi Setiawan <ilhamsetiawan@duck.com>, 2023.
+
+msgid ""
+msgstr ""
+"Project-Id-Version: Battery Indicator Icon 9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-28 \n"
+"Last-Translator: Ilham Adi Setiawan <ilhamsetiawan@duck.com>\n"
+"Language-Team: Indoneia <LL@li.org>\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/prefs.js:27
+msgid "Battery status icon style"
+msgstr "Gaya ikon status baterai"
+
+#: src/prefs.js:28
+msgid "Bold"
+msgstr "Tebal"
+
+#: src/prefs.js:29
+msgid "Slim"
+msgstr "Tipis"
+
+#: src/prefs.js:30
+msgid "Plump"
+msgstr "Sintal"
+
+#: src/prefs.js:31
+msgid "Plain"
+msgstr "Polos"
+
+#: src/prefs.js:32
+msgid "Circle"
+msgstr "Lingkaran"
+
+#: src/prefs.js:33
+msgid "Text"
+msgstr "Teks"
+
+#: src/prefs.js:36
+msgid "Battery percentage text"
+msgstr "Teks Persentase baterai"
+
+#: src/prefs.js:37
+msgid "Hidden"
+msgstr "Tersembunyi"
+
+#: src/prefs.js:38
+msgid "Inside the icon"
+msgstr "Didalam ikon"
+
+#: src/prefs.js:39
+msgid "Inside the icon (vertical)"
+msgstr "Didalam ikon (vertikal)"
+
+#: src/prefs.js:40
+msgid "Next to the icon"
+msgstr "Disebelah ikon"
+
+#: src/prefs.js:45
+msgid "Horizontal scale"
+msgstr "Skala horizontal"
+
+#: src/prefs.js:49
+msgid "Orientation"
+msgstr "vertikal"
+
+#: src/prefs.js:51
+msgid "Horizontal"
+msgstr "Horizontal"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14
+msgid "Battery status icon style (bold, slim, plain, circle, hidden)"
+msgstr "Gaya ikon Status baterai (tebal,tipis,polos,Lingkaran,Tersembunyi)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:19
+msgid ""
+"Show battery percentage text in icon (hidden: 0, horizontal: 1, vertical: 2)"
+msgstr "Tampilkan teks Persentase baterai di ikon ( Tersembunyi: 0 , Horizontal: 1 , vertical: 2)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:24
+msgid "Icon orientation (vertical, horizontal)"
+msgstr "Posisi Ikon ( vertical , horizontal)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:30
+msgid "Icon scale as aspect ratio width/height"
+msgstr "Skala ikon sebagai aspek rasio lebar/tinggi"
