@@ -1,0 +1,98 @@
+# SPANISH TRANSLATION :D.
+# Copyright (C) YEAR Battery Indicator Icon
+# This file is distributed under the same license as the Battery Indicator Icon package.
+# Fernando Morales <summus_imperator@outlook.com>, 2024.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Battery Indicator Icon 9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-17 12:53+0200\n"
+"PO-Revision-Date: 2024-02-28 15:22+(-0600)\n"
+"Last-Translator: Fernando Morales <summus_imperator@outlook.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/prefs.js:27
+msgid "Battery status icon style"
+msgstr "Estilo del icono del estado de la batería"
+
+#: src/prefs.js:28
+msgid "Bold"
+msgstr "Negrita"
+
+#: src/prefs.js:29
+msgid "Slim"
+msgstr "Delgado"
+
+#: src/prefs.js:30
+msgid "Plump"
+msgstr "Grueso"
+
+#: src/prefs.js:31
+msgid "Plain"
+msgstr "Plano"
+
+#: src/prefs.js:32
+msgid "Circle"
+msgstr "Circular"
+
+#: src/prefs.js:33
+msgid "Text"
+msgstr "Texto"
+
+#: src/prefs.js:36
+msgid "Battery percentage text"
+msgstr "Texto del porcentaje de batería"
+
+#: src/prefs.js:37
+msgid "Hidden"
+msgstr "Oculto"
+
+#: src/prefs.js:38
+msgid "Inside the icon"
+msgstr "Dentro del icono"
+
+#: src/prefs.js:39
+msgid "Inside the icon (vertical)"
+msgstr "Dentro del icono (vertical)"
+
+#: src/prefs.js:40
+msgid "Next to the icon"
+msgstr "Al lado del icono"
+
+#: src/prefs.js:45
+msgid "Horizontal scale"
+msgstr "Escala horizontal"
+
+#: src/prefs.js:49
+msgid "Orientation"
+msgstr "Orientación"
+
+#: src/prefs.js:50
+msgid "Vertical"
+msgstr "Vertical"
+
+#: src/prefs.js:51
+msgid "Horizontal"
+msgstr "Horizontal"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14
+msgid "Battery status icon style (bold, slim, plain, circle, hidden)"
+msgstr "Estilo del icono de estado de la batería (Negrita, Delgado, Plano, Circular, Oculto)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:19
+msgid "Show battery percentage text in icon (hidden: 0, horizontal: 1, vertical: 2)"
+msgstr "Mostrar texto de porcentaje de batería en el icono (oculto: 0, horizontal: 1, vertical: 2)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:24
+msgid "Icon orientation (vertical, horizontal)"
+msgstr "Orientación del icono (vertical, horizontal)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:30
+msgid "Icon scale as aspect ratio width/height"
+msgstr "Escala de iconos como relación de aspecto en anchura/altura"
