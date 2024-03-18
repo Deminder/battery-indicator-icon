@@ -241,7 +241,7 @@ export default class BatteryIndicatorIcon extends Extension {
         sysIndicator._drawicondbg = new BatteryDrawIcon({
           style_class: 'battery-indicator',
         });
-        Main.uiGroup.add_actor(sysIndicator._drawicondbg);
+        Main.uiGroup.add_child(sysIndicator._drawicondbg);
       }
     }
   }
