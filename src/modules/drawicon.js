@@ -7,6 +7,8 @@ import Clutter from 'gi://Clutter';
 import PangoCairo from 'gi://PangoCairo';
 import Cairo from 'cairo';
 
+import { pathFromDescription, pathStroke, PathNodeType } from './path.js';
+
 export const BInner = {
   EMPTY: 0,
   CHARGING: 1,
@@ -44,7 +46,7 @@ function batteryIconPaint(
       cr.stroke();
     }
   };
-  Clutter.cairo_set_source_color(cr, style.fColor);
+  cr.setSourceColor(style.fColor);
   // Battery button: (fill) rectangle, arc or (stroke) line
   buttonPathFunc(cr, style);
   drawMethod(buttonDraw);
@@ -55,7 +57,7 @@ function batteryIconPaint(
   drawMethod(rectDraw);
 
   // Fill inner battery: (rounded) rectangle
-  Clutter.cairo_set_source_color(cr, style.fillColor);
+  cr.setSourceColor(style.fillColor);
   innerRectPathFunc(cr, style);
   cr.fill();
 
@@ -132,7 +134,7 @@ export const BatteryDrawIcon = GObject.registerClass(
       this.idolWidget = idolWidget;
 
       // https://github.com/LineageOS/android_frameworks_base/blob/-/packages/SettingsLib/src/com/android/settingslib/graph/BatteryMeterDrawableBase.java#L158
-      this._bolt_path = Clutter.Path.new_with_description(
+      this._bolt_path = pathFromDescription(
         'M 165 0 L 887 0 L 455 368 L 1000 368 L 9 1000 L 355 475 L 0 475 z'
       );
       this._plump_bolt_path = plumpBoltPath();
@@ -189,7 +191,7 @@ export const BatteryDrawIcon = GObject.registerClass(
         style
       );
 
-      Clutter.cairo_set_source_color(cr, style.fColor);
+      cr.setSourceColor(style.fColor);
       cr.save();
       cr.setOperator(Cairo.Operator.DEST_OUT);
       innerContentPath(cr, style);
@@ -214,7 +216,7 @@ export const BatteryDrawIcon = GObject.registerClass(
         style
       );
 
-      Clutter.cairo_set_source_color(cr, style.fColor);
+      cr.setSourceColor(style.fColor);
       innerContentPath(cr, style);
       cr.fill();
     }
@@ -230,7 +232,7 @@ export const BatteryDrawIcon = GObject.registerClass(
         style
       );
 
-      Clutter.cairo_set_source_color(cr, style.fColor);
+      cr.setSourceColor(style.fColor);
       cr.setOperator(Cairo.Operator.DEST_OUT);
       cr.setLineCap(CAIRO_LINE_CAP_ROUND);
       const outlineWidth = plumpInnerContentPath(cr, style);
@@ -257,7 +259,7 @@ export const BatteryDrawIcon = GObject.registerClass(
         style
       );
 
-      Clutter.cairo_set_source_color(cr, Clutter.Color.get_static('white'));
+      cr.setSourceColor(Clutter.Color.get_static('white'));
       cr.setOperator(Cairo.Operator.DEST_OUT);
       innerContentPath(cr, style);
       cr.fill();
@@ -272,7 +274,7 @@ export const BatteryDrawIcon = GObject.registerClass(
       bColor.alpha *= 0.5;
 
       cr.save();
-      Clutter.cairo_set_source_color(cr, bColor);
+      cr.setSourceColor(bColor);
       // Circle Background
       cr.setLineWidth(strokeWidth);
       cr.translate(cw, ch);
@@ -281,13 +283,13 @@ export const BatteryDrawIcon = GObject.registerClass(
       cr.stroke();
 
       // Circle fill foreground
-      Clutter.cairo_set_source_color(cr, fillColor);
+      cr.setSourceColor(fillColor);
       const angleOffset = -0.5 * Math.PI;
       cr.arc(0, 0, radius, angleOffset, angleOffset + p * 2 * Math.PI);
       cr.stroke();
       cr.restore();
 
-      Clutter.cairo_set_source_color(cr, fColor);
+      cr.setSourceColor(fColor);
       innerContentPath(cr, style);
       cr.fill();
     }
@@ -509,22 +511,8 @@ function chargingBoltPath(
   );
   cr.scale(boltWidth / 1000, boltHeight / 1000);
 
-  if ('to_cairo_path' in boltPath) {
-    boltPath.to_cairo_path(cr);
-  } else {
-    const drawPathNode = {
-      [Clutter.PathNodeType.CLOSE]: () => cr.closePath(),
-      [Clutter.PathNodeType.CURVE_TO]: points =>
-        cr.curveTo(...points.slice(0, 6)),
-      [Clutter.PathNodeType.LINE_TO]: points =>
-        cr.lineTo(...points.slice(0, 2)),
-      [Clutter.PathNodeType.MOVE_TO]: points =>
-        cr.moveTo(...points.slice(0, 2)),
-    };
-    boltPath.foreach(node =>
-      drawPathNode[node.type](node.points.flatMap(p => [p.x, p.y]))
-    );
-  }
+  pathStroke(boltPath, cr);
+
   return boltHeight / 1000;
 }
 
@@ -666,34 +654,25 @@ function plumpBoltPath(size = 1000, diagonalAngle = (Math.PI * 70) / 180) {
   const leftCorner = add([bezierRadius, 0], deepLeftCorner);
   const leftCorner2 = add([bezierRadius2, 0], deepLeftCorner);
 
-  const p = new Clutter.Path();
-  const center = ([x, y]) => [x + size / 2, -y + size / 2];
+  const center = ([x, y]) => ({ x: x + size / 2, y: -y + size / 2 });
 
   const bxy = [bx, by];
-  p.add_move_to(...center(bxy));
-  p.add_line_to(...center(bxy2));
-  p.add_curve_to(...center(bxy3), ...center(topCusp2), ...center(topCusp));
-  p.add_line_to(...center(leftValley));
-  p.add_curve_to(
-    ...center(leftValley2),
-    ...center(leftCorner2),
-    ...center(leftCorner)
-  );
-  p.add_line_to(...center(neg(bxy)));
-  p.add_line_to(...center(neg(bxy2)));
-  p.add_curve_to(
-    ...center(neg(bxy3)),
-    ...center(neg(topCusp2)),
-    ...center(neg(topCusp))
-  );
-  p.add_line_to(...center(neg(leftValley)));
-  p.add_curve_to(
-    ...center(neg(leftValley2)),
-    ...center(neg(leftCorner2)),
-    ...center(neg(leftCorner))
-  );
-  p.add_close();
-  return p;
+  return [
+    [PathNodeType.MOVE_TO, [bxy]],
+    [PathNodeType.LINE_TO, [bxy2]],
+    [PathNodeType.CURVE_TO, [bxy3, topCusp2, topCusp]],
+    [PathNodeType.LINE_TO, [leftValley]],
+    [PathNodeType.CURVE_TO, [leftValley2, leftCorner2, leftCorner]],
+    [PathNodeType.LINE_TO, [neg(bxy)]],
+    [PathNodeType.LINE_TO, [neg(bxy2)]],
+    [PathNodeType.CURVE_TO, [neg(bxy3), neg(topCusp2), neg(topCusp)]],
+    [PathNodeType.LINE_TO, [neg(leftValley)]],
+    [
+      PathNodeType.CURVE_TO,
+      [neg(leftValley2), neg(leftCorner2), neg(leftCorner)],
+    ],
+    [PathNodeType.CLOSE, []],
+  ].map(([type, xyPoints]) => ({ type, points: xyPoints.map(center) }));
 }
 
 /*
