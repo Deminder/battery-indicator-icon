@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the Battery Indicator Icon package.
 # Fernando Morales <summus_imperator@outlook.com>, 2024.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Battery Indicator Icon 9\n"
@@ -14,7 +13,7 @@ msgstr ""
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/prefs.js:27
