@@ -10,5 +10,3 @@ debug-guest.sh
 
 node_modules
 package-lock.json
-
-src/modules/sdt

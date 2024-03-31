@@ -11,16 +11,7 @@ endif
 
 include sdt/build/default.mk
 
-SDT_MODULES := util injection
-SDT_DIR := $(SRC_DIR)/modules/sdt
-SDT_FILES := $(patsubst %,$(SDT_DIR)/%.js,$(SDT_MODULES))
-
-SOURCE_FILES += $(SDT_FILES)
-DEBUGMODE_MODULE := $(SDT_DIR)/util.js
-
-$(SDT_FILES): $(SDT_DIR)/%.js: sdt/src/modules/%.js
-	@mkdir -p $(@D)
-	@cp $< $@
+DEBUGMODE_MODULE := $(SRC_DIR)/modules/sdt/util.js
 
 include sdt/build/gnome-extension.mk
 
