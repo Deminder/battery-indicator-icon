@@ -6,6 +6,8 @@ import St from 'gi://St';
 import Clutter from 'gi://Clutter';
 import PangoCairo from 'gi://PangoCairo';
 import Cairo from 'cairo';
+import { PACKAGE_VERSION } from 'resource:///org/gnome/shell/misc/config.js';
+const [majorShellVersion] = PACKAGE_VERSION.split('.').map(s => Number(s));
 
 import { pathFromDescription, pathStroke, PathNodeType } from './path.js';
 
@@ -31,6 +33,14 @@ export const BStatusStyle = {
   HIDE: 5,
 };
 
+function setContextColor(cr, color) {
+  if (majorShellVersion >= 46) {
+    cr.setSourceColor(color);
+  } else {
+    Clutter.cairo_set_source_color(cr, color);
+  }
+}
+
 function batteryIconPaint(
   cr,
   buttonPathFunc,
@@ -46,7 +56,7 @@ function batteryIconPaint(
       cr.stroke();
     }
   };
-  cr.setSourceColor(style.fColor);
+  setContextColor(cr, style.fColor);
   // Battery button: (fill) rectangle, arc or (stroke) line
   buttonPathFunc(cr, style);
   drawMethod(buttonDraw);
@@ -57,7 +67,7 @@ function batteryIconPaint(
   drawMethod(rectDraw);
 
   // Fill inner battery: (rounded) rectangle
-  cr.setSourceColor(style.fillColor);
+  setContextColor(cr, style.fillColor);
   innerRectPathFunc(cr, style);
   cr.fill();
 
@@ -191,7 +201,7 @@ export const BatteryDrawIcon = GObject.registerClass(
         style
       );
 
-      cr.setSourceColor(style.fColor);
+      setContextColor(cr, style.fColor);
       cr.save();
       cr.setOperator(Cairo.Operator.DEST_OUT);
       innerContentPath(cr, style);
@@ -216,7 +226,7 @@ export const BatteryDrawIcon = GObject.registerClass(
         style
       );
 
-      cr.setSourceColor(style.fColor);
+      setContextColor(cr, style.fColor);
       innerContentPath(cr, style);
       cr.fill();
     }
@@ -232,7 +242,7 @@ export const BatteryDrawIcon = GObject.registerClass(
         style
       );
 
-      cr.setSourceColor(style.fColor);
+      setContextColor(cr, style.fColor);
       cr.setOperator(Cairo.Operator.DEST_OUT);
       cr.setLineCap(CAIRO_LINE_CAP_ROUND);
       const outlineWidth = plumpInnerContentPath(cr, style);
@@ -259,7 +269,7 @@ export const BatteryDrawIcon = GObject.registerClass(
         style
       );
 
-      cr.setSourceColor(Clutter.Color.get_static('white'));
+      setContextColor(cr, Clutter.Color.get_static('white'));
       cr.setOperator(Cairo.Operator.DEST_OUT);
       innerContentPath(cr, style);
       cr.fill();
@@ -274,7 +284,7 @@ export const BatteryDrawIcon = GObject.registerClass(
       bColor.alpha *= 0.5;
 
       cr.save();
-      cr.setSourceColor(bColor);
+      setContextColor(cr, bColor);
       // Circle Background
       cr.setLineWidth(strokeWidth);
       cr.translate(cw, ch);
@@ -283,13 +293,13 @@ export const BatteryDrawIcon = GObject.registerClass(
       cr.stroke();
 
       // Circle fill foreground
-      cr.setSourceColor(fillColor);
+      setContextColor(cr, fillColor);
       const angleOffset = -0.5 * Math.PI;
       cr.arc(0, 0, radius, angleOffset, angleOffset + p * 2 * Math.PI);
       cr.stroke();
       cr.restore();
 
-      cr.setSourceColor(fColor);
+      setContextColor(cr, fColor);
       innerContentPath(cr, style);
       cr.fill();
     }
