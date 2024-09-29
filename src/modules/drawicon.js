@@ -4,6 +4,7 @@
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
+import Cogl from 'gi://Cogl';
 import PangoCairo from 'gi://PangoCairo';
 import Cairo from 'cairo';
 import { PACKAGE_VERSION } from 'resource:///org/gnome/shell/misc/config.js';
@@ -38,6 +39,16 @@ function setContextColor(cr, color) {
     cr.setSourceColor(color);
   } else {
     Clutter.cairo_set_source_color(cr, color);
+  }
+}
+
+function getWhiteColor() {
+  if (majorShellVersion >= 47) {
+    const c = new Cogl.Color();
+    c.init_from_4f(1.0, 1.0, 1.0, 1.0);
+    return c;
+  } else {
+    return Clutter.Color.get_static('white');
   }
 }
 
@@ -269,7 +280,7 @@ export const BatteryDrawIcon = GObject.registerClass(
         style
       );
 
-      setContextColor(cr, Clutter.Color.get_static('white'));
+      setContextColor(cr, getWhiteColor());
       cr.setOperator(Cairo.Operator.DEST_OUT);
       innerContentPath(cr, style);
       cr.fill();
