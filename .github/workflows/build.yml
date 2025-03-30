@@ -33,5 +33,10 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: target/default/battery-indicator-icon@Deminder.shell-extension.zip
+          draft: true
+          generate_release_notes: true
+          files: |
+            target/default/battery-indicator-icon@Deminder.shell-extension.zip
