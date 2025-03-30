@@ -34,6 +34,31 @@ export const BStatusStyle = {
   HIDE: 5,
 };
 
+function colorToRGBALegacy(color) {
+  const c = color.to_pixel();
+  return [
+    (c >> 24) & 0xff,
+    (c >> 16) & 0xff,
+    (c >> 8) & 0xff,
+    (c & 0xff) / 255.0,
+  ];
+}
+
+function colorToRGBA(color) {
+  return [
+    Math.round(color.get_red() * 255.0),
+    Math.round(color.get_green() * 255.0),
+    Math.round(color.get_blue() * 255.0),
+    color.get_alpha(),
+  ];
+}
+
+export function rgbaStr(color) {
+  const rgba =
+    majorShellVersion >= 48 ? colorToRGBA(color) : colorToRGBALegacy(color);
+  return `rgba(${rgba.join(',')})`;
+}
+
 function setContextColor(cr, color) {
   if (majorShellVersion >= 46) {
     cr.setSourceColor(color);
