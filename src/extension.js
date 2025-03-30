@@ -8,7 +8,12 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import { InjectionTracker } from './modules/sdt/injection.js';
 
-import { BatteryDrawIcon, BInner, BStatusStyle } from './modules/drawicon.js';
+import {
+  BatteryDrawIcon,
+  BInner,
+  BStatusStyle,
+  rgbaStr,
+} from './modules/drawicon.js';
 import { PowerManagerProxyMock } from './modules/mock.js';
 import { debugMode } from './modules/util.js';
 
@@ -104,16 +109,6 @@ export default class BatteryIndicatorIcon extends Extension {
         if (statusStyleStr === 'hidden') {
           // Text only mode: Style existing percentage labels
           const colors = sysIndicator._drawicon.iconColors;
-          const rgbaStr = color => {
-            const c = color.to_pixel();
-            const rgba = [
-              (c >> 24) & 0xff,
-              (c >> 16) & 0xff,
-              (c >> 8) & 0xff,
-              (c & 0xff) / 255.0,
-            ].join(',');
-            return `rgba(${rgba})`;
-          };
           style = charging
             ? `border-top: solid 3px ${rgbaStr(
                 colors.foreground
