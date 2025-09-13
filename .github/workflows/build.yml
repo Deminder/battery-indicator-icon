@@ -1,40 +1,31 @@
 name: CI
 
-on:
-  push:
-    tags: [ 'v*' ]
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+on: push
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v5
         with:
           submodules: 'recursive'
       - uses: actions/setup-node@v2.4.0
-      - name: Setup build dependencies
+      - name: Setup
         run: |
           npm install
           sudo apt-get update
           sudo apt-get install -y reuse gnome-shell-extensions gettext
 
-      - name: Run linter
+      - name: Lint
         run: make lint
 
-      - name: Build gnome-extension ZIP file
-        run: make zip
+      - name: Build
+        run: make all
 
       - name: Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
         with:
           draft: true
           generate_release_notes: true
