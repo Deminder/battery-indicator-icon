@@ -1,5 +1,5 @@
 {
-  "shell-version": ["45", "46", "47", "48"],
+  "shell-version": ["45", "46", "47", "48", "49"],
   "uuid": "battery-indicator-icon@Deminder",
   "gettext-domain": "battery-indicator-icon",
   "settings-schema": "org.gnome.shell.extensions.battery-indicator-icon",
