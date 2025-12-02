@@ -1,0 +1,99 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Battery Indicator Icon
+# This file is distributed under the same license as the Battery Indicator Icon package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Battery Indicator Icon 15\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-03-30 13:32+0200\n"
+"PO-Revision-Date: 2025-12-03 00:48+0300\n"
+"Last-Translator: Fraxinus Acer\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.8\n"
+
+#: src/prefs.js:27
+msgid "Battery status icon style"
+msgstr "Стиль значка состояния батареи"
+
+#: src/prefs.js:28
+msgid "Bold"
+msgstr "Крупная"
+
+#: src/prefs.js:29
+msgid "Slim"
+msgstr "Тонкая"
+
+#: src/prefs.js:30
+msgid "Plump"
+msgstr "Закруглённая"
+
+#: src/prefs.js:31
+msgid "Plain"
+msgstr "Плоская"
+
+#: src/prefs.js:32
+msgid "Circle"
+msgstr "Круговая"
+
+#: src/prefs.js:33
+msgid "Text"
+msgstr "Текстовая"
+
+#: src/prefs.js:36
+msgid "Battery percentage text"
+msgstr "Значение процентов батареи"
+
+#: src/prefs.js:37
+msgid "Hidden"
+msgstr "Скрыто"
+
+#: src/prefs.js:38
+msgid "Inside the icon"
+msgstr "Внутри иконки"
+
+#: src/prefs.js:39
+msgid "Inside the icon (vertical)"
+msgstr "Внутри иконки (вертикально)"
+
+#: src/prefs.js:40
+msgid "Next to the icon"
+msgstr "Рядом с иконкой"
+
+#: src/prefs.js:45
+msgid "Horizontal scale"
+msgstr "Горизонтальный размер"
+
+#: src/prefs.js:49
+msgid "Orientation"
+msgstr "Ориентация"
+
+#: src/prefs.js:50
+msgid "Vertical"
+msgstr "Вертиально"
+
+#: src/prefs.js:51
+msgid "Horizontal"
+msgstr "Горизонтально"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:14
+msgid "Battery status icon style (bold, slim, plain, circle, hidden)"
+msgstr "Стиль значка состояния батареи (Крупный, Тонкий, Плоский, Круговой, Скрытый)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:19
+msgid "Show battery percentage text in icon (hidden: 0, horizontal: 1, vertical: 2)"
+msgstr "Отображать процент заряда батареи в виде текста на значке (скрыто: 0, по горизонтали: 1, по вертикали: 2)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:24
+msgid "Icon orientation (vertical, horizontal)"
+msgstr "Ориентация иконки (вертикально, горизонтально)"
+
+#: src/schemas/org.gnome.shell.extensions.battery-indicator-icon.gschema.xml:30
+msgid "Icon scale as aspect ratio width/height"
+msgstr "Масштабирование значка в соответствии с соотношением сторон ширина/высота"
