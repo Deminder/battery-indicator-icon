@@ -42,8 +42,10 @@ export default class BatteryIndicatorIcon extends Extension {
         qs,
         '_addItems' in qs ? '_addItems' : '_addItemsBefore',
         (...args) => {
-          this._setup(qs);
-          injection.clear();
+          if ('_system' in qs) {
+            this._setup(qs);
+            injection.clear();
+          }
           injection.previous.call(qs, ...args);
         }
       );
